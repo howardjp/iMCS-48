@@ -51,11 +51,11 @@ class Arm(iarm.cpu.Cpu):
         Is the parameter defined, or not None
 
         Raises an exception if
-        1. the parameter is undefined
+        1. The parameter is undefined
         :param arg: The parameter to check
         :return: None
         """
-        if arg is None:
+        if arg is None or arg == '':
             raise ReferenceError("Parameter is None, did you miss a comma?")
 
     def check_register(self, arg):
@@ -190,7 +190,7 @@ class Arm(iarm.cpu.Cpu):
     # Instructions
     def MOV(self, Rx, Ry):
         self.check_arguments(high_registers=(Rx, Ry))
-        self.register[Rx] = self.get_register_value(Ry)
+        self.register[Rx] = self.register[Ry]
 
     def MOVS(self, Ra, Rb):
         if Rb is None:
@@ -200,16 +200,22 @@ class Arm(iarm.cpu.Cpu):
             self.register[Ra] = int(Rb[1:])
         else:
             self.check_arguments(low_registers=(Ra, Rb))
-            self.register[Ra] = self.get_register_value(Rb)
+            self.register[Ra] = self.register[Rb]
 
     def ADD(self, Rx, Ry, Rz):
         # TODO implement ADD Rx, Rt, #imm10_4
         # TODO implement ADD Sp, SP, #imm9_4
         self.check_arguments(high_registers=(Rx, Ry, Rz))
-        self.register[Rx] = self.get_register_value(Ry) + self.get_register_value(Rz)
+        self.register[Rx] = self.register[Ry] + self.register[Rz]
 
     def evaluate(self, code):
         parsed = self.parse_lines(code)
+
+        # TODO check whole code block for errors
+
+        # TODO add all labels in code block
+
+        # execute code
         for i in parsed:
             if not any(i[0]):
                 continue  # We have a blank line
