@@ -3,7 +3,7 @@ import random
 
 
 class Cpu(object):
-    def __init__(self, bit_width, registers, memory_size, generate_random=False):
+    def __init__(self, bit_width, registers, memory_size, generate_random=False, postpone_execution=False):
         """
         Inittialize the Cpu
 
@@ -17,6 +17,7 @@ class Cpu(object):
         self._max_registers = registers
         self._memory_size = memory_size
         self._generate_random = generate_random
+        self._postpone_execution = postpone_execution
 
         self.register = Register(self._bit_width, self._generate_random)  # Holder for the register values
         self.memory = {}  # Holder for memory
@@ -52,22 +53,6 @@ class Cpu(object):
                     self._rules[key](val)
             else:
                 raise LookupError("Rule for {} does not exist. Make sure the rule starts with 'rule_'".format(key))
-
-    def get_register_value(self, R):
-        """
-        Get the register value of R
-
-        If R has not been defined yet,
-        then either 0 or a random number will be returned
-        depending on the flag _generate_random
-        :param R: The register to get the value
-        :return: The integer value of the register
-        """
-        if self._generate_random:
-            if self.register.get(R, None) is None:
-                val = random.randint(0, 2**self._bit_width - 1)
-                self.register[R] = val
-        return self.register.get(R, 0)
 
     def evaluate(self, code):
         # must be implemented on inheriting classes
