@@ -18,7 +18,7 @@ class Cpu(object):
         self._memory_size = memory_size
         self._generate_random = generate_random
 
-        self.register = {}  # Holder for the register values
+        self.register = Register(self._bit_width, self._generate_random)  # Holder for the register values
         self.memory = {}  # Holder for memory
         self.program = []  # Hold the current program, used for jumps
         self.labels = {}  # A label to program location lookup
@@ -74,4 +74,24 @@ class Cpu(object):
         raise NotImplementedError("The class cant determine how to run the code")
 
 
+class Register(dict):
+    def __init__(self, bit_width, generate_random=False, *args, **kwargs):
+        self._generate_random = generate_random
+        self._bit_width = bit_width
+        super().__init__(*args, **kwargs)
 
+    def __getitem__(self, item):
+        """
+        Get the register value of item
+
+        If item has not been defined yet,
+        then either 0 or a random number will be returned
+        depending on the flag _generate_random
+        :param item: The register to get the value
+        :return: The integer value of the register
+        """
+        if self._generate_random:
+            if super().get(item, None) is None:
+                val = random.randint(0, 2**self._bit_width - 1)
+                self[item] = val
+        return super().get(item, 0)
