@@ -10,19 +10,21 @@ class Arm(iarm.cpu.Cpu):
     REGISTER_REGEX = r'R(\d*)'
     IMMEDIATE_REGEX = r'#(\d*)'
 
-    def separate_line(self, line):
-        """
-        separate the line into each of its parts
-        line reference, instruction, param1, param2, param3
-        :param line: The string to parse
-        :return: A parsed 5 tuple
-        """
-        search = re.search(r'(\A[^ \s,]*)?\s*(\w*)(?:\s*([^ \s,]*)(?:,\s*([^ \s,]*)(?:,\s*([^ \s,]*))?)?)?\s*', line)
-        groups = search.groups()
-        return groups
-
     def parse_lines(self, code):
-        return [(self.separate_line(i), i) for i in code.split('\n')]
+        """
+        Return a list of the parsed code
+
+        For each line, return a three-tuple containing:
+        1. The label
+        2. The instruction
+        3. Any arguments or parameters
+
+        An element in the tuple may be None or '' if it did not find anything
+        :param code: The code to parse
+        :return: A list of tuples in the form of (label, instruction, parameters)
+        """
+        parser = re.compile(r'^(\w*)?\s*(\w*)\s*(.*)$', re.MULTILINE)
+        return parser.findall(code)
 
     def is_register(self, R):
         """
@@ -187,45 +189,102 @@ class Arm(iarm.cpu.Cpu):
         if (i_num % 4) != 0:
             raise ReferenceError("Immediate {} is not a multiple of 4".format(arg))
 
-    # Instructions
-    def MOV(self, Rx, Ry):
-        self.check_arguments(high_registers=(Rx, Ry))
-        self.register[Rx] = self.register[Ry]
+    def get_parameters(self, regex_exp, parameters):
+        """
+        Given a regex expression and the string with the paramers,
+        either return a regex match object or raise an exception if the regex
+        did not find a match
+        :param regex_exp:
+        :param parameters:
+        :return:
+        """
+        match = re.match(regex_exp, parameters)
+        if not match:
+            raise ReferenceError("Parameters are None, did you miss a comma?")
+        return match
 
-    def MOVS(self, Ra, Rb):
-        if Rb is None:
-            raise ReferenceError("Parameter is None, did you miss a comma?")
+    def get_two_parameters(self, regex_exp, parameters):
+        """
+        Get two parameters from a given regex expression
+
+        Raise an exception if more than two were found
+        :param regex_exp:
+        :param parameters:
+        :return:
+        """
+        match = self.get_parameters(regex_exp, parameters)
+        Rx, Ry, other = match.groups()
+        if other:
+            raise ReferenceError("Extra arguments found: {}".format(other))
+        return Rx, Ry
+
+    def get_three_parameters(self, regex_exp, parameters):
+        """
+        Get three parameters from a given regex expression
+
+        Raise an exception if more than three were found
+        :param regex_exp:
+        :param parameters:
+        :return:
+        """
+        match = self.get_parameters(regex_exp, parameters)
+        Rx, Ry, Rz, other = match.groups()
+        if other:
+            raise ReferenceError("Extra arguments found: {}".format(other))
+        return Rx, Ry, Rz
+
+    # Instructions
+    def MOV(self, params):
+        Rx, Ry = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+
+        self.check_arguments(high_registers=(Rx, Ry))
+        def MOV_func():
+            self.register[Rx] = self.register[Ry]
+
+        return MOV_func
+
+    def MOVS(self, params):
+        Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+
         if self.is_immediate(Rb):
             self.check_arguments(low_registers=[Ra], imm8=[Rb])
-            self.register[Ra] = int(Rb[1:])
-        else:
+            def MOVS_func():
+                self.register[Ra] = int(Rb[1:])
+            return MOVS_func
+        elif self.is_register(Rb):
             self.check_arguments(low_registers=(Ra, Rb))
-            self.register[Ra] = self.register[Rb]
+            def MOVS_func():
+                self.register[Ra] = self.register[Rb]
+            return MOVS_func
+        else:
+            raise ReferenceError("Unknown parameter: {}".format(Rb))
 
-    def ADD(self, Rx, Ry, Rz):
+    def ADD(self, params):
+        Rx, Ry, Rz = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+
         # TODO implement ADD Rx, Rt, #imm10_4
         # TODO implement ADD Sp, SP, #imm9_4
         self.check_arguments(high_registers=(Rx, Ry, Rz))
-        self.register[Rx] = self.register[Ry] + self.register[Rz]
+        def ADD_func():
+            self.register[Rx] = self.register[Ry] + self.register[Rz]
+        return ADD_func
 
     def evaluate(self, code):
         parsed = self.parse_lines(code)
 
-        # TODO check whole code block for errors
+        # TODO Find all labels (don't need to have them point to anything yet
 
-        # TODO add all labels in code block
-
-        # execute code
+        # Validate the code and get back a function to execute that instruction
         for i in parsed:
-            if not any(i[0]):
+            if not any(i):
                 continue  # We have a blank line
+            label, op, params = i
 
-            op = self.ops[i[0][1]]
-            op(*i[0][2:len(inspect.signature(op).parameters) + 2])
+            validate = self.ops[op]
 
-            if i[0][0]:
-                self.labels[i[0][0]] = len(self.program)
-            self.program.append(i)
+            fun = validate(params)
+
+            self.program.append(fun)
 
 if __name__ == '__main__':
     interp = Arm(32, 15, 1024)
