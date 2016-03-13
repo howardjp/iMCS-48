@@ -13,3 +13,7 @@ class RuleError(IarmError):
 
 class ParsingError(IarmError):
     pass
+
+
+class ValidationError(IarmError):
+    pass

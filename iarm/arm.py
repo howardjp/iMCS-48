@@ -276,12 +276,30 @@ class Arm(iarm.cpu.Cpu):
         self.labels.update(labels)  # These will exist eventually in this code block
 
         # Validate the code and get back a function to execute that instruction
+        program = []
+        labels = {}
         for line in parsed:
             if not any(line):
                 continue  # We have a blank line
             label, op, params = line
-            instruction = self.ops[op](params)
-            self.program.append(instruction)
+
+            # Set the label to the next instruction
+            if label:
+                labels[label] = len(self.program) + len(program)
+
+            # If the op lookup fails, it was a bad instruction
+            try:
+                func = self.ops[op]
+            except KeyError:
+                raise iarm.exceptions.ValidationError("Instruction {} does not exist".format(op))
+
+            instruction = func(params)
+            program.append(instruction)
+
+        # Code block was successfully validated, update the main program
+        self.program += program
+        self.labels.update(labels)
+
 
 if __name__ == '__main__':
     interp = Arm(32, 15, 1024)
