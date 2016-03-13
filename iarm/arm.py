@@ -272,8 +272,8 @@ class Arm(iarm.cpu.Cpu):
         parsed = self.parse_lines(code)
 
         # Find all labels (don't need to have them point to anything yet
-        labels = {line[0]: None for line in parsed if line[0]}
-        self.labels.update(labels)  # These will exist eventually in this code block
+        temp_labels = {line[0]: None for line in parsed if line[0]}
+        self.labels.update(temp_labels)  # These will exist eventually in this code block
 
         # Validate the code and get back a function to execute that instruction
         program = []
@@ -291,10 +291,17 @@ class Arm(iarm.cpu.Cpu):
             try:
                 func = self.ops[op]
             except KeyError:
+                [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
                 raise iarm.exceptions.ValidationError("Instruction {} does not exist".format(op))
 
-            instruction = func(params)
-            program.append(instruction)
+            # Run the instruction, if it raised an error, roll back the labels
+            try:
+                instruction = func(params)
+            except iarm.exceptions.IarmError:
+                [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
+                raise
+
+            program.append(instruction)  # It validated, add it to the temp instruction list
 
         # Code block was successfully validated, update the main program
         self.program += program
