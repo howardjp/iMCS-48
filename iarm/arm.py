@@ -271,19 +271,17 @@ class Arm(iarm.cpu.Cpu):
     def evaluate(self, code):
         parsed = self.parse_lines(code)
 
-        # TODO Find all labels (don't need to have them point to anything yet
+        # Find all labels (don't need to have them point to anything yet
+        labels = {line[0]: None for line in parsed if line[0]}
+        self.labels.update(labels)  # These will exist eventually in this code block
 
         # Validate the code and get back a function to execute that instruction
-        for i in parsed:
-            if not any(i):
+        for line in parsed:
+            if not any(line):
                 continue  # We have a blank line
-            label, op, params = i
-
-            validate = self.ops[op]
-
-            fun = validate(params)
-
-            self.program.append(fun)
+            label, op, params = line
+            instruction = self.ops[op](params)
+            self.program.append(instruction)
 
 if __name__ == '__main__':
     interp = Arm(32, 15, 1024)
