@@ -4,6 +4,7 @@ import re
 import inspect
 
 import iarm.cpu
+import iarm.exceptions
 
 
 class Arm(iarm.cpu.Cpu):
@@ -58,7 +59,7 @@ class Arm(iarm.cpu.Cpu):
         :return: None
         """
         if arg is None or arg == '':
-            raise ReferenceError("Parameter is None, did you miss a comma?")
+            raise iarm.exceptions.RuleError("Parameter is None, did you miss a comma?")
 
     def check_register(self, arg):
         """
@@ -75,10 +76,10 @@ class Arm(iarm.cpu.Cpu):
         self.check_parameter(arg)
         match = re.search(self.REGISTER_REGEX, arg)
         if match is None:
-            raise ReferenceError("Parameter {} is not a register".format(arg))
+            raise iarm.exceptions.RuleError("Parameter {} is not a register".format(arg))
         r_num = int(match.groups()[0])
         if r_num > self._max_registers:
-            raise ReferenceError("Register {} is greater than defined registers of {}".format(arg, self._max_registers))
+            raise iarm.exceptions.RuleError("Register {} is greater than defined registers of {}".format(arg, self._max_registers))
 
         return r_num
 
@@ -94,7 +95,7 @@ class Arm(iarm.cpu.Cpu):
         self.check_parameter(arg)
         match = re.search(self.IMMEDIATE_REGEX, arg)
         if match is None:
-            raise ReferenceError("Parameter {} is not an immediate".format(arg))
+            raise iarm.exceptions.RuleError("Parameter {} is not an immediate".format(arg))
         return int(match.groups()[0])
 
     def check_immediate_unsigned_value(self, arg, bit):
@@ -108,8 +109,8 @@ class Arm(iarm.cpu.Cpu):
         :return: The value of the immediate
         """
         i_num = self.check_immediate(arg)
-        if (i_num > (2**bit - 1)) or(i_num < 0):
-            raise ReferenceError("Immediate {} is not an unsigned {} bit value".format(arg, bit))
+        if (i_num > (2**bit - 1)) or (i_num < 0):
+            raise iarm.exceptions.RuleError("Immediate {} is not an unsigned {} bit value".format(arg, bit))
         return i_num
 
     def check_immediate_value(self, arg, _max, _min=0):
@@ -124,15 +125,19 @@ class Arm(iarm.cpu.Cpu):
         :return: The immediate value
         """
         i_num = self.check_immediate(arg)
-        if (i_num > _max) or(i_num < _min):
-            raise ReferenceError("Immediate {} is not within the range of [{}, {}]".format(arg, _min, _max))
+        if (i_num > _max) or (i_num < _min):
+            raise iarm.exceptions.RuleError("Immediate {} is not within the range of [{}, {}]".format(arg, _min, _max))
         return i_num
+
+    def check_multiple_of(self, value, multiple_of):
+        if (value % multiple_of) != 0:
+            raise iarm.exceptions.RuleError("Immediate {} is not a multiple of {}".format(value, multiple_of))
 
     # Rules
     def rule_low_registers(self, arg):
         r_num = self.check_register(arg)
         if r_num > 7:
-            raise ReferenceError("Using a high register in low register position for parameter {}".format(arg))
+            raise iarm.exceptions.RuleError("Using a high register in low register position for parameter {}".format(arg))
 
     def rule_high_registers(self, arg):
         self.check_register(arg)
@@ -158,36 +163,30 @@ class Arm(iarm.cpu.Cpu):
 
     def rule_imm6_2(self, arg):
         i_num = self.check_immediate_unsigned_value(arg, 6)
-        if (i_num % 2) != 0:
-            raise ReferenceError("Immediate {} is not a multiple of 2".format(arg))
+        self.check_multiple_of(i_num, 2)
 
     def rule_imm7_4(self, arg):
         i_num = self.check_immediate_unsigned_value(arg, 7)
-        if (i_num % 4) != 0:
-            raise ReferenceError("Immediate {} is not a multiple of 4".format(arg))
+        self.check_multiple_of(i_num, 4)
 
     def rule_imm8(self, arg):
         self.check_immediate_unsigned_value(arg, 8)
 
     def rule_immS8_2(self, arg):
         i_num = self.check_immediate_value(arg, 2**8 - 1, -(2**8))
-        if (i_num % 2) != 0:
-            raise ReferenceError("Immediate {} is not a multiple of 2".format(arg))
+        self.check_multiple_of(i_num, 2)
 
     def rule_imm9_4(self, arg):
         i_num = self.check_immediate_unsigned_value(arg, 9)
-        if (i_num % 4) != 0:
-            raise ReferenceError("Immediate {} is not a multiple of 4".format(arg))
+        self.check_multiple_of(i_num, 4)
 
     def rule_imm10_4(self, arg):
         i_num = self.check_immediate_unsigned_value(arg, 10)
-        if (i_num % 4) != 0:
-            raise ReferenceError("Immediate {} is not a multiple of 4".format(arg))
+        self.check_multiple_of(i_num, 4)
 
     def rule_immS25_4(self, arg):
         i_num = self.check_immediate_value(arg, 2**25, -2**25)
-        if (i_num % 4) != 0:
-            raise ReferenceError("Immediate {} is not a multiple of 4".format(arg))
+        self.check_multiple_of(i_num, 4)
 
     def get_parameters(self, regex_exp, parameters):
         """
@@ -200,7 +199,7 @@ class Arm(iarm.cpu.Cpu):
         """
         match = re.match(regex_exp, parameters)
         if not match:
-            raise ReferenceError("Parameters are None, did you miss a comma?")
+            raise iarm.exceptions.ParsingError("Parameters are None, did you miss a comma?")
         return match
 
     def get_two_parameters(self, regex_exp, parameters):
@@ -215,7 +214,7 @@ class Arm(iarm.cpu.Cpu):
         match = self.get_parameters(regex_exp, parameters)
         Rx, Ry, other = match.groups()
         if other:
-            raise ReferenceError("Extra arguments found: {}".format(other))
+            raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         return Rx, Ry
 
     def get_three_parameters(self, regex_exp, parameters):
@@ -230,7 +229,7 @@ class Arm(iarm.cpu.Cpu):
         match = self.get_parameters(regex_exp, parameters)
         Rx, Ry, Rz, other = match.groups()
         if other:
-            raise ReferenceError("Extra arguments found: {}".format(other))
+            raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         return Rx, Ry, Rz
 
     # Instructions
@@ -257,7 +256,7 @@ class Arm(iarm.cpu.Cpu):
                 self.register[Ra] = self.register[Rb]
             return MOVS_func
         else:
-            raise ReferenceError("Unknown parameter: {}".format(Rb))
+            raise iarm.exceptions.ParsingError("Unknown parameter: {}".format(Rb))
 
     def ADD(self, params):
         Rx, Ry, Rz = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
