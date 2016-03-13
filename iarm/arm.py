@@ -215,7 +215,12 @@ class Arm(iarm.cpu.Cpu):
         Rx, Ry, other = match.groups()
         if other:
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
-        return Rx, Ry
+        if Rx and Ry:
+            return Rx, Ry
+        elif not Rx:
+            raise iarm.exceptions.ParsingError("Missing first positional argument")
+        else:
+            raise iarm.exceptions.ParsingError("Missing second positional argument")
 
     def get_three_parameters(self, regex_exp, parameters):
         """
