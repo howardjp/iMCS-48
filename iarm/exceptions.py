@@ -17,3 +17,7 @@ class ParsingError(IarmError):
 
 class ValidationError(IarmError):
     pass
+
+
+class NotImplementedError(IarmError):
+    pass
