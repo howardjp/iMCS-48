@@ -1,0 +1,4 @@
+
+
+class UnconditionalBranch(object):
+    pass
