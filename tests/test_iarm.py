@@ -1,11 +1,11 @@
 import unittest
-import iarm.arm
+import iarm.iarm
 import iarm.exceptions
 
 
 class TestArm(unittest.TestCase):
     def setUp(self):
-        self.interp = iarm.arm.Arm(32, 15, 0, False, True)
+        self.interp = iarm.iarm.Arm(32, 15, 0, False, True)
 
 
 class TestArmParsing(TestArm):

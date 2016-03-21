@@ -5,7 +5,7 @@ import inspect
 
 import iarm.cpu
 import iarm.exceptions
-import iarm.arm as instructions
+import iarm.arm_instructions as instructions
 
 
 class Arm(iarm.cpu.Cpu, instructions.DataMovement, instructions.Arithmetic,
