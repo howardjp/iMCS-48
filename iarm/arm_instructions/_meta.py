@@ -141,7 +141,10 @@ class _Meta(iarm.cpu.RegisterCpu):
                 "Using a high register in low register position for parameter {}".format(arg))
 
     def rule_high_registers(self, arg):
-        self.check_register(arg)
+        r_num = self.check_register(arg)
+        if r_num > 12:
+            raise iarm.exceptions.RuleError(
+                "Using special register in general register position for parameter {}".format(arg))
 
     def rule_imm3(self, arg):
         """
@@ -237,3 +240,36 @@ class _Meta(iarm.cpu.RegisterCpu):
         if other:
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         return Rx, Ry, Rz
+
+    def set_APSR_flag_to_value(self, flag, value):
+        """
+        Set or clear flag in ASPR
+        :param flag: The flag to set
+        :param value: If value evaulates to true, it is set, cleared otherwise
+        :return:
+        """
+        if flag == 'N':
+            bit = 31
+        elif flag == 'Z':
+            bit = 30
+        elif flag == 'C':
+            bit = 29
+        elif flag == 'V':
+            bit = 28
+        else:
+            raise AttributeError("Flag {} does not exist in the APSR".format(flag))
+
+        if value:
+            self.register['APSR'] |= (1 << bit)
+        else:
+            self.register['APSR'] -= (1 << bit) if (self.register['APSR'] & (1 << bit)) else 0
+
+    def rule_special_registers(self, arg):
+        """Raises an exception if the register is not a special register"""
+        special_registers = "PSR APSR IPSR EPSR"
+        if arg not in special_registers.split():
+            raise iarm.exceptions.RuleError("{} is not a special register; Must be [{}]".format(arg, special_registers))
+
+    def rule_LR_or_high_registers(self, arg):
+        if arg != 'LR':
+            self.check_arguments(high_registers=(arg,))
