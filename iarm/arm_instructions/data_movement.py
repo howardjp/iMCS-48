@@ -23,7 +23,7 @@ class DataMovement(_Meta):
     def MOV(self, params):
         Rx, Ry = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        self.check_arguments(high_registers=(Rx, Ry))
+        self.check_arguments(any_register=(Rx, Ry))
 
         def MOV_func():
             self.register[Rx] = self.register[Ry]
@@ -58,7 +58,7 @@ class DataMovement(_Meta):
     def MRS(self, params):
         Rj, Rspecial = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        self.check_arguments(LR_or_high_registers=(Rj,), special_registers=(Rspecial,))
+        self.check_arguments(LR_or_general_purpose_registers=(Rj,), special_registers=(Rspecial,))
 
         def MRS_func():
             # TODO add combination registers IEPSR, IAPSR, and EAPSR
@@ -73,7 +73,7 @@ class DataMovement(_Meta):
     def MSR(self, params):
         Rspecial, Rj = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        self.check_arguments(LR_or_high_registers=(Rj,), special_registers=(Rspecial,))
+        self.check_arguments(LR_or_general_purpose_registers=(Rj,), special_registers=(Rspecial,))
 
         def MSR_func():
             # TODO add combination registers IEPSR, IAPSR, and EAPSR

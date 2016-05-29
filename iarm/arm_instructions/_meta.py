@@ -135,16 +135,29 @@ class _Meta(iarm.cpu.RegisterCpu):
 
     # Rules
     def rule_low_registers(self, arg):
+        """Low registers are R0 - R7"""
         r_num = self.check_register(arg)
         if r_num > 7:
             raise iarm.exceptions.RuleError(
-                "Using a high register in low register position for parameter {}".format(arg))
+                "Register {} is not a low register".format(arg))
 
     def rule_high_registers(self, arg):
+        """High registers are R8 - R12"""
+        r_num = self.check_register(arg)
+        if (r_num < 8) or (r_num > 12):
+            raise iarm.exceptions.RuleError(
+                "Register {} is not a high register".format(arg))
+
+    def rule_general_purpose_registers(self, arg):
+        """General purpose registers are R0-R12"""
         r_num = self.check_register(arg)
         if r_num > 12:
             raise iarm.exceptions.RuleError(
-                "Using special register in general register position for parameter {}".format(arg))
+                "Register {} is not a general purpose register".format(arg))
+
+    def rule_any_register(self, arg):
+        """Any register R0 - R15"""
+        self.check_register(arg)
 
     def rule_imm3(self, arg):
         """
@@ -270,6 +283,6 @@ class _Meta(iarm.cpu.RegisterCpu):
         if arg not in special_registers.split():
             raise iarm.exceptions.RuleError("{} is not a special register; Must be [{}]".format(arg, special_registers))
 
-    def rule_LR_or_high_registers(self, arg):
+    def rule_LR_or_general_purpose_registers(self, arg):
         if arg != 'LR':
-            self.check_arguments(high_registers=(arg,))
+            self.check_arguments(general_purpose_registers=(arg,))

@@ -18,7 +18,7 @@ class Arithmetic(_Meta):
 
         # TODO implement ADD Rx, Rt, #imm10_4
         # TODO implement ADD Sp, SP, #imm9_4
-        self.check_arguments(high_registers=(Rx, Ry, Rz))
+        self.check_arguments(any_register=(Rx, Ry, Rz))
         def ADD_func():
             self.register[Rx] = self.register[Ry] + self.register[Rz]
         return ADD_func
