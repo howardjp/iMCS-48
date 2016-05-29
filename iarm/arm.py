@@ -68,6 +68,14 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
             self.program[self.register['PC']]()
             self.register['PC'] += 1
 
+    def print_status_bits(self):
+        print("N: {} Z: {} C: {} V: {}".format(
+            1 if self.register['APSR'] & (1 << 31) else 0,
+            1 if self.register['APSR'] & (1 << 30) else 0,
+            1 if self.register['APSR'] & (1 << 29) else 0,
+            1 if self.register['APSR'] & (1 << 28) else 0,
+        ))
+
 
 if __name__ == '__main__':
-    interp = Arm(32, 16, 1024, 8, False)
+    interp = Arm(32, 16, 1024, 8, False, False)
