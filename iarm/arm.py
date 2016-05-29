@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import iarm.cpu
 import iarm.exceptions
 import iarm.arm_instructions as instructions
 
