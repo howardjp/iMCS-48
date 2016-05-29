@@ -1,6 +1,7 @@
 import unittest
 import iarm.iarm
 import iarm.exceptions
+import random
 
 
 class TestArm(unittest.TestCase):
@@ -106,6 +107,44 @@ class TestArmArithmetic(TestArm):
     """
     Test all arithmetic instructions
     """
+
+
+class TestArmLinkedRegisters(TestArm):
+    """
+    Make sure that PC, LR, and SP are linked to R15, R14, and R13 respectively
+    """
+    def test_PC_register_link(self):
+        REG1 = 'PC'
+        REG2 = 'R15'
+        self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+        self.interp.register[REG1] = 0
+        self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+        self.interp.register[REG2] = 1
+        self.assertEqual(self.interp.register[REG1], 1)
+        self.interp.register[REG1] = random.randint(0, 2**self.interp._bit_width-1)
+        self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+
+    def test_LR_register_link(self):
+        REG1 = 'LR'
+        REG2 = 'R14'
+        self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+        self.interp.register[REG1] = 0
+        self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+        self.interp.register[REG2] = 1
+        self.assertEqual(self.interp.register[REG1], 1)
+        self.interp.register[REG1] = random.randint(0, 2 ** self.interp._bit_width - 1)
+        self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+
+    def test_SP_register_link(self):
+        REG1 = 'SP'
+        REG2 = 'R13'
+        self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+        self.interp.register[REG1] = 0
+        self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+        self.interp.register[REG2] = 1
+        self.assertEqual(self.interp.register[REG1], 1)
+        self.interp.register[REG1] = random.randint(0, 2 ** self.interp._bit_width - 1)
+        self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
 
 if __name__ == '__main_':
     unittest.main()

@@ -12,6 +12,9 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.register.link('PC', 'R15')
+        self.register.link('LR', 'R14')
+        self.register.link('SP', 'R13')
         self.register['PC'] = 0
         self.equates = {}
 
