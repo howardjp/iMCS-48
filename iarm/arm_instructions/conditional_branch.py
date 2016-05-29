@@ -1,4 +1,4 @@
+from ._meta import _Meta
 
-
-class ConditionalBranch(object):
+class ConditionalBranch(_Meta):
     pass

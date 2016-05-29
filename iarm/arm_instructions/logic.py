@@ -1,6 +1,7 @@
 import iarm.exceptions
+from ._meta import _Meta
 
-class Logic(object):
+class Logic(_Meta):
     def ANDS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 

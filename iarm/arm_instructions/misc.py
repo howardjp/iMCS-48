@@ -1,4 +1,5 @@
+from ._meta import _Meta
 
 
-class Misc(object):
+class Misc(_Meta):
     pass

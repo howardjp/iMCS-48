@@ -1,4 +1,5 @@
+from ._meta import _Meta
 
 
-class Memory(object):
+class Memory(_Meta):
     pass

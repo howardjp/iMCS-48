@@ -1,4 +1,5 @@
+from ._meta import _Meta
 
 
-class UnconditionalBranch(object):
+class UnconditionalBranch(_Meta):
     pass

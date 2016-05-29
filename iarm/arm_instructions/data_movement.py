@@ -4,9 +4,10 @@ on the CPU (register to register)
 """
 
 import iarm.exceptions
+from ._meta import _Meta
 
 
-class DataMovement(object):
+class DataMovement(_Meta):
     def MOV(self, params):
         Rx, Ry = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 

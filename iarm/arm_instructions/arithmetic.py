@@ -1,7 +1,8 @@
 import iarm.exceptions
+from ._meta import _Meta
 
 
-class Arithmetic(object):
+class Arithmetic(_Meta):
     def ADCS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 

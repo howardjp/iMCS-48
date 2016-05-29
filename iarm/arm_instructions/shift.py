@@ -1,4 +1,5 @@
+from ._meta import _Meta
 
 
-class Shift(object):
+class Shift(_Meta):
     pass
