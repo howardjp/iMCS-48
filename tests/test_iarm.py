@@ -1,5 +1,5 @@
 import unittest
-import iarm.iarm
+import iarm.arm
 import iarm.exceptions
 import random
 
@@ -7,7 +7,7 @@ import random
 class TestArm(unittest.TestCase):
     """The base class for all arm tests"""
     def setUp(self):
-        self.interp = iarm.iarm.Arm(32, 16, 1024, 8, False)
+        self.interp = iarm.arm.Arm(32, 16, 1024, 8, False)
 
 
 class TestArmParsing(TestArm):
@@ -145,6 +145,86 @@ class TestArmLinkedRegisters(TestArm):
         self.assertEqual(self.interp.register[REG1], 1)
         self.interp.register[REG1] = random.randint(0, 2 ** self.interp._bit_width - 1)
         self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+
+
+class TestArmDataMovement(TestArm):
+    def test_MOV(self):
+        self.interp.register['R0'] = 5
+        self.interp.register['R1'] = 0
+        self.assertEqual(self.interp.register['R1'], 0)
+
+        self.interp.evaluate(" MOV R1, R0")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R1'], 5)
+
+    def test_MOV_imm(self):
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.evaluate(" MOV R1, #3")
+
+    # TODO test high and special registers
+
+    def test_MOVS_zero_register(self):
+        self.interp.register['R0'] = 5
+        self.interp.register['R1'] = 0
+        self.assertEqual(self.interp.register['R0'], 5)
+
+        self.interp.evaluate(" MOVS R0, R1")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 0)
+        self.assertTrue(self.interp.register['APSR'] & (1 << 30))
+        self.assertFalse(self.interp.register['APSR'] & (1 << 31))
+
+    def test_MOVS_zero_imm(self):
+        self.interp.register['R0'] = 5
+        self.assertEqual(self.interp.register['R0'], 5)
+
+        self.interp.evaluate(" MOVS R0, #0")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 0)
+        self.assertTrue(self.interp.register['APSR'] & (1 << 30))
+        self.assertFalse(self.interp.register['APSR'] & (1 << 31))
+
+    def test_MOVS_negative_register(self):
+        self.interp.register['R0'] = 0
+        self.interp.register['R1'] = -1
+        self.assertEqual(self.interp.register['R0'], 0)
+
+        self.interp.evaluate(" MOVS R0, R1")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], -1)
+        self.assertFalse(self.interp.register['APSR'] & (1 << 30))
+        self.assertTrue(self.interp.register['APSR'] & (1 << 31))
+
+    def test_MOVS_positive_register(self):
+        self.interp.register['R1'] = 0
+        self.interp.register['R1'] = 5
+        self.assertEqual(self.interp.register['R0'], 0)
+
+        self.interp.evaluate(" MOVS R0, R1")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 5)
+        self.assertFalse(self.interp.register['APSR'] & (1 << 30))
+        self.assertFalse(self.interp.register['APSR'] & (1 << 31))
+
+    def test_MOVS_positive_imm(self):
+        self.interp.register['R1'] = 0
+        self.assertEqual(self.interp.register['R0'], 0)
+
+        self.interp.evaluate(" MOVS R0, #5")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 5)
+        self.assertFalse(self.interp.register['APSR'] & (1 << 30))
+        self.assertFalse(self.interp.register['APSR'] & (1 << 31))
+
+    def test_MOVS_high_register(self):
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.evaluate(" MOVS R9, R1")
 
 if __name__ == '__main_':
     unittest.main()
