@@ -105,7 +105,7 @@ class DataMovement(_Meta):
         self.check_arguments(low_registers=(Ra, Rb))
 
         def REV_func():
-            self.register[Ra] = int('{:016b}'.format(Rb)[::-1], 2)
+            self.register[Ra] = int('{:032b}'.format(self.register[Rb])[::-1], 2)
 
         return REV_func
 
@@ -116,7 +116,7 @@ class DataMovement(_Meta):
 
         def REV16_func():
             # TODO is this correct?
-            self.register[Ra] = int('{:016b}'.format(Rb & 0xFFFF)[::-1], 2)
+            self.register[Ra] = int('{:016b}'.format(self.register[Rb] & 0xFFFF)[::-1], 2)
 
         return REV16_func
 

@@ -284,5 +284,5 @@ class _Meta(iarm.cpu.RegisterCpu):
             raise iarm.exceptions.RuleError("{} is not a special register; Must be [{}]".format(arg, special_registers))
 
     def rule_LR_or_general_purpose_registers(self, arg):
-        if arg != 'LR':
+        if (arg != 'LR') and (arg != 'R14'):
             self.check_arguments(general_purpose_registers=(arg,))

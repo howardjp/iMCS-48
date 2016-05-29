@@ -226,5 +226,77 @@ class TestArmDataMovement(TestArm):
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.evaluate(" MOVS R9, R1")
 
+    def test_MRS_low_register(self):
+        self.interp.evaluate(" MOVS R0, #0")  # Set the Z flag
+        self.interp.evaluate(" MRS R1, APSR")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['APSR'], (1 << 30))
+        self.assertEqual(self.interp.register['R1'], (1 << 30))
+
+    def test_MRS_LR_register(self):
+        self.interp.evaluate(" MOVS R0, #0")  # Set the Z flag
+        self.interp.evaluate(" MRS LR, APSR")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['APSR'], (1 << 30))
+        self.assertEqual(self.interp.register['LR'], (1 << 30))
+
+    def test_MRS_PSR(self):
+        self.interp.evaluate(" MOVS R0, #0")  # Set the Z flag
+        self.interp.evaluate(" MRS R14, PSR")  # R14 is also LR
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['APSR'], (1 << 30))
+        self.assertEqual(self.interp.register['R14'], (1 << 30))
+
+    def test_MSR_register(self):
+        self.interp.register['R0'] = (15 << 28)
+        self.interp.evaluate(" MSR APSR, R0")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['APSR'], (15 << 28))
+
+    def test_MVNS(self):
+        self.interp.register['R0'] = -5
+        self.interp.evaluate(" MVNS R1, R0")
+        self.interp.evaluate(" MVNS R2, R1")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R1'], 4)
+        self.assertEqual(self.interp.register['R2'], -5)
+
+    def test_MVNS_high_register(self):
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.evaluate(" MVNS R9, R0")
+
+    def test_REV(self):
+        self.interp.register['R7'] = 0xABC
+        self.interp.register['R5'] = 0xF
+        self.interp.evaluate(" REV R6, R7")
+        self.interp.evaluate(" REV R4, R5")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R6'], 0x3D500000)
+        self.assertEqual(self.interp.register['R4'], 0xF0000000)
+
+    def test_REV_high_register(self):
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.evaluate(" REV R4, R10")
+
+    def test_REV16(self):
+        self.interp.register['R7'] = 0xABC
+        self.interp.register['R5'] = 0xF
+        self.interp.evaluate(" REV16 R6, R7")
+        self.interp.evaluate(" REV16 R4, R5")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R6'], 0x3D50)
+        self.assertEqual(self.interp.register['R4'], 0xF000)
+
+    def test_REV16_high_register(self):
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.evaluate(" REV R2, R11")
+
 if __name__ == '__main_':
     unittest.main()
