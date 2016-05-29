@@ -77,30 +77,27 @@ class TestArmRules(TestArm):
             self.interp.evaluate(' MOVS R{}, #3'.format(self.interp._max_registers+1))
         self.assertIn('greater', str(cm.exception))
 
-    @unittest.skip('Currently there are no instructions to test that raise this type of exception')
     def test_parameter_not_an_immediate(self):
         with self.assertRaises(iarm.exceptions.RuleError) as cm:
-            pass
+            self.interp.check_arguments(imm8=('R4',))
 
     @unittest.skip('Currently there are no instructions to test that raise this type of exception')
     def test_parameter_not_an_immediate_unsigned(self):
         with self.assertRaises(iarm.exceptions.RuleError) as cm:
             pass
 
-    @unittest.skip('Currently there are no instructions to test that raise this type of exception')
     def test_parameter_immediate_out_of_range(self):
         with self.assertRaises(iarm.exceptions.RuleError) as cm:
-            pass
+            self.interp.check_arguments(imm8=('#1234',))
 
-    @unittest.skip('Currently there are no instructions to test that raise this type of exception')
     def test_parameter_immediate_not_multiple_of(self):
         with self.assertRaises(iarm.exceptions.RuleError) as cm:
-            pass
+            self.interp.check_arguments(imm6_2=('#3',))
+            self.interp.check_arguments(imm7_4=('#6',))
 
-    @unittest.skip('Currently there are no instructions to test that raise this type of exception')
     def test_parameter_low_register(self):
         with self.assertRaises(iarm.exceptions.RuleError) as cm:
-            pass
+            self.interp.check_arguments(low_registers=('R8',))
 
 
 class TestArmArithmetic(TestArm):
