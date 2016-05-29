@@ -6,7 +6,7 @@ class RegisterCpu(object):
     """
     A register based CPU
     """
-    def __init__(self, bit_width, max_registers, memory_size, memory_width, generate_random=False):
+    def __init__(self, bit_width, max_registers, memory_size, memory_width, generate_random=False, postpone_execution=True):
         """
         Initialize the CPU and get all instructions and "rules"
 
@@ -18,6 +18,7 @@ class RegisterCpu(object):
         :param max_registers: How many registers are there
         :param memory_size: What is the size of memory
         :param generate_random: If a register or memory address is undefined, should a random value be generated for it?
+        :param postpone_execution: Should instructions be executed immediately or just store the program until a value is asked for (lazy execution)
         :return:
         """
         self._bit_width = bit_width
@@ -25,6 +26,7 @@ class RegisterCpu(object):
         self._memory_width = memory_width
         self._memory_size = memory_size
         self._generate_random = generate_random
+        self._postpone_execution = postpone_execution
 
         self.register = RandomValueDict(self._bit_width, self._generate_random)  # Holder for the register values
         self.memory = RandomValueDict(self._memory_width, self._generate_random)  # Holder for memory

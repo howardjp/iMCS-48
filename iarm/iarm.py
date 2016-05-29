@@ -10,6 +10,10 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
           instructions.ConditionalBranch, instructions.UnconditionalBranch,
           instructions.Misc):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.register['PC'] = 0
+
     def evaluate(self, code):
         parsed = self.parse_lines(code)
 
@@ -48,6 +52,18 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
         # Code block was successfully validated, update the main program
         self.program += program
         self.labels.update(labels)
+
+        if not self._postpone_execution:
+            self.run()
+
+    def run(self):
+        """
+        Run to the current end of the program
+        :return:
+        """
+        while len(self.program) > self.register['PC']:
+            self.program[self.register['PC']]()
+            self.register['PC'] += 1
 
 
 if __name__ == '__main__':
