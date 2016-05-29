@@ -4,12 +4,15 @@ import iarm.exceptions
 
 
 class TestArm(unittest.TestCase):
+    """The base class for all arm tests"""
     def setUp(self):
-        self.interp = iarm.iarm.Arm(32, 15, 0, False, True)
+        self.interp = iarm.iarm.Arm(32, 15, 1024, 8, False)
 
 
 class TestArmParsing(TestArm):
-
+    """
+    Test all parsing exceptions
+    """
     def test_bad_parameter(self):
         with self.assertRaises(iarm.exceptions.ParsingError):
             self.interp.evaluate(' MOVS R1, 123')
@@ -46,14 +49,18 @@ class TestArmParsing(TestArm):
 
 
 class TestArmValidation(TestArm):
-
+    """
+    Test validation errors
+    """
     def test_bad_instruction(self):
         with self.assertRaises(iarm.exceptions.ValidationError):
             self.interp.evaluate(' BADINST')
 
 
 class TestArmRules(TestArm):
-
+    """
+    Test all validation rules
+    """
     @unittest.skip('Currently there are no instructions to test that raise this type of exception')
     def test_parameter_none(self):
         with self.assertRaises(iarm.exceptions.RuleError):
@@ -93,6 +100,12 @@ class TestArmRules(TestArm):
     def test_parameter_low_register(self):
         with self.assertRaises(iarm.exceptions.RuleError) as cm:
             pass
+
+
+class TestArmArithmetic(TestArm):
+    """
+    Test all arithmetic instructions
+    """
 
 if __name__ == '__main_':
     unittest.main()

@@ -3,30 +3,34 @@ import random
 
 
 class Cpu(object):
-    def __init__(self, bit_width, registers, memory_size, generate_random=False, postpone_execution=False):
+    def __init__(self, bit_width, max_registers, memory_size, memory_width, generate_random=False):
         """
-        Inittialize the Cpu
+        Initialize the CPU and get all instructions and "rules"
+
+        Instructions are operations that the CPU can perform and are defined as bing all capital methods
+        Rules are methods that instructions use verify that the arguments are usable by the instruction.
+        Rules are defined as starting with 'rule_' and are used by passing the rule name with the arguments as a list.
 
         :param bit_width: What is the size of the registers
-        :param registers: How many registers are there
+        :param max_registers: How many registers are there
         :param memory_size: What is the size of memory
         :param generate_random: If a register or memory address is undefined, should a random value be generated for it?
         :return:
         """
         self._bit_width = bit_width
-        self._max_registers = registers
+        self._max_registers = max_registers
+        self._memory_width = memory_width
         self._memory_size = memory_size
         self._generate_random = generate_random
-        self._postpone_execution = postpone_execution
 
-        self.register = Register(self._bit_width, self._generate_random)  # Holder for the register values
-        self.memory = {}  # Holder for memory
+        self.register = RandomValueDict(self._bit_width, self._generate_random)  # Holder for the register values
+        self.memory = RandomValueDict(self._memory_width, self._generate_random)  # Holder for memory
         self.program = []  # Hold the current program, used for jumps
         self.labels = {}  # A label to program location lookup
         self.ops = {}  # What operations are defined
-
         self._rules = {}  # Holder for parameter rules
 
+        # Get all instructions and rules
         for obj in inspect.getmembers(self, predicate=inspect.ismethod):
             # Is returned in the form of (method name, method)
             name = obj[0]
@@ -42,7 +46,7 @@ class Cpu(object):
     def check_arguments(self, **kwargs):
         """
         Determine if the parameters meet the specifications
-        kwargs contains lists goruped by their parameter
+        kwargs contains lists grouped by their parameter
         rules are defined by methods starting with 'rule_'
         :param kwargs:
         :return:
@@ -59,10 +63,18 @@ class Cpu(object):
         raise NotImplementedError("The class cant determine how to run the code")
 
 
-class Register(dict):
+class RandomValueDict(dict):
+    """
+    Class for registers and memory
+    Used to simulate randomness by generating random values if a value has not been set yet.
+    """
     def __init__(self, bit_width, generate_random=False, *args, **kwargs):
-        self._generate_random = generate_random
+        """
+        :param bit_width: What is the width of the memory being accessed. Used to determine the max value
+        :param generate_random: Should a random number be generated, or zero returned if the value is not set
+        """
         self._bit_width = bit_width
+        self._generate_random = generate_random
         super().__init__(*args, **kwargs)
 
     def __getitem__(self, item):

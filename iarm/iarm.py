@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-import re
-import inspect
-
 import iarm.cpu
 import iarm.exceptions
 import iarm.arm_instructions as instructions
@@ -12,7 +9,6 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
           instructions.Logic, instructions.Shift, instructions.Memory,
           instructions.ConditionalBranch, instructions.UnconditionalBranch,
           instructions.Misc):
-
 
     def evaluate(self, code):
         parsed = self.parse_lines(code)
@@ -55,12 +51,4 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
 
 if __name__ == '__main__':
-    interp = Arm(32, 15, 1024)
-
-
-
-
-
-
-
-
+    interp = Arm(32, 15, 1024, 8, False)
