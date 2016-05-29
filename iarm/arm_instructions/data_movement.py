@@ -8,18 +8,6 @@ from ._meta import _Meta
 
 
 class DataMovement(_Meta):
-    def _set_NZ_flags(self, register):
-        """Set N and Z flags based on the value of the register"""
-        if self.register[register] < 0:
-            self.set_APSR_flag_to_value('N', 1)
-            self.set_APSR_flag_to_value('Z', 0)
-        elif self.register[register] == 0:
-            self.set_APSR_flag_to_value('N', 0)
-            self.set_APSR_flag_to_value('Z', 1)
-        else:
-            self.set_APSR_flag_to_value('N', 0)
-            self.set_APSR_flag_to_value('Z', 0)
-
     def MOV(self, params):
         Rx, Ry = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
@@ -40,7 +28,7 @@ class DataMovement(_Meta):
                 self.register[Ra] = int(Rb[1:])
 
                 # Set N and Z status flags
-                self._set_NZ_flags(Ra)
+                self.set_NZ_flags(Ra)
 
             return MOVS_func
         elif self.is_register(Rb):
@@ -49,7 +37,7 @@ class DataMovement(_Meta):
             def MOVS_func():
                 self.register[Ra] = self.register[Rb]
 
-                self._set_NZ_flags(Ra)
+                self.set_NZ_flags(Ra)
 
             return MOVS_func
         else:
@@ -95,7 +83,7 @@ class DataMovement(_Meta):
 
         def MVNS_func():
             self.register[Ra] = ~self.register[Rb]
-            self._set_NZ_flags(Ra)
+            self.set_NZ_flags(Ra)
 
         return MVNS_func
 

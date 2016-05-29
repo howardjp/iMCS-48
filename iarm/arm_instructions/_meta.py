@@ -286,3 +286,28 @@ class _Meta(iarm.cpu.RegisterCpu):
     def rule_LR_or_general_purpose_registers(self, arg):
         if (arg != 'LR') and (arg != 'R14'):
             self.check_arguments(general_purpose_registers=(arg,))
+
+    def set_NZ_flags(self, register):
+        """Set N and Z flags based on the value of the register"""
+        if self.register[register] < 0:
+            self.set_APSR_flag_to_value('N', 1)
+            self.set_APSR_flag_to_value('Z', 0)
+        elif self.register[register] == 0:
+            self.set_APSR_flag_to_value('N', 0)
+            self.set_APSR_flag_to_value('Z', 1)
+        else:
+            self.set_APSR_flag_to_value('N', 0)
+            self.set_APSR_flag_to_value('Z', 0)
+
+    def set_NZCV_flags(self, register):
+        """Set N and Z flags based on the value of the register"""
+        # TODO figure out how to get C and V flags
+        if self.register[register] < 0:
+            self.set_APSR_flag_to_value('N', 1)
+            self.set_APSR_flag_to_value('Z', 0)
+        elif self.register[register] == 0:
+            self.set_APSR_flag_to_value('N', 0)
+            self.set_APSR_flag_to_value('Z', 1)
+        else:
+            self.set_APSR_flag_to_value('N', 0)
+            self.set_APSR_flag_to_value('Z', 0)
