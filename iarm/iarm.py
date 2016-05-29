@@ -13,6 +13,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.register['PC'] = 0
+        self.equates = {}
 
     def evaluate(self, code):
         parsed = self.parse_lines(code)
@@ -67,4 +68,4 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
 
 if __name__ == '__main__':
-    interp = Arm(32, 15, 1024, 8, False)
+    interp = Arm(32, 16, 1024, 8, False)

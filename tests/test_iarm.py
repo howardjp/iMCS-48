@@ -6,7 +6,7 @@ import iarm.exceptions
 class TestArm(unittest.TestCase):
     """The base class for all arm tests"""
     def setUp(self):
-        self.interp = iarm.iarm.Arm(32, 15, 1024, 8, False)
+        self.interp = iarm.iarm.Arm(32, 16, 1024, 8, False)
 
 
 class TestArmParsing(TestArm):

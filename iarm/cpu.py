@@ -15,14 +15,14 @@ class RegisterCpu(object):
         Rules are defined as starting with 'rule_' and are used by passing the rule name with the arguments as a list.
 
         :param bit_width: What is the size of the registers
-        :param max_registers: How many registers are there
+        :param max_registers: How many registers are there (one indexed)
         :param memory_size: What is the size of memory
         :param generate_random: If a register or memory address is undefined, should a random value be generated for it?
         :param postpone_execution: Should instructions be executed immediately or just store the program until a value is asked for (lazy execution)
         :return:
         """
         self._bit_width = bit_width
-        self._max_registers = max_registers
+        self._max_registers = max_registers - 1  # Code was made around this being zero indexed
         self._memory_width = memory_width
         self._memory_size = memory_size
         self._generate_random = generate_random
@@ -80,6 +80,7 @@ class RandomValueDict(dict):
         """
         self._bit_width = bit_width
         self._generate_random = generate_random
+        self._linked_keys = {}  # Used to mirror two entries in the dict
         super().__init__(*args, **kwargs)
 
     def __getitem__(self, item):
@@ -97,3 +98,29 @@ class RandomValueDict(dict):
                 val = random.randint(0, 2**self._bit_width - 1)
                 self[item] = val
         return super().get(item, 0)
+
+    def link(self, key1, key2):
+        """
+        Make these two keys have the same value
+        :param key1:
+        :param key2:
+        :return:
+        """
+        # TODO make this have more than one key linked
+        # TODO Maybe make the value a set?
+        self._linked_keys[key1] = key2
+        self._linked_keys[key2] = key1
+
+    def __setitem__(self, key, value):
+        """
+        If two values are linked, set the value of both
+        :param key:
+        :param value:
+        :return:
+        """
+        # TODO make this transitive
+        # TODO if 'a' and 'b' are linked, and 'b' and 'c' are linked, updaing 'c' does not update 'a'
+        if key in self._linked_keys.keys():
+            key2 = self._linked_keys[key]
+            super().__setitem__(key2, value)
+        super().__setitem__(key, value)
