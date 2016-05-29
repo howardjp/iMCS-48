@@ -3,7 +3,7 @@ import iarm.exceptions
 import iarm.cpu
 
 
-class _Meta(iarm.cpu.Cpu):
+class _Meta(iarm.cpu.RegisterCpu):
     """
     Give helper functions to the instructions
     """

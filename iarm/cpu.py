@@ -2,7 +2,10 @@ import inspect
 import random
 
 
-class Cpu(object):
+class RegisterCpu(object):
+    """
+    A register based CPU
+    """
     def __init__(self, bit_width, max_registers, memory_size, memory_width, generate_random=False):
         """
         Initialize the CPU and get all instructions and "rules"
