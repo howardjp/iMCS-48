@@ -259,7 +259,7 @@ class TestArmRules(TestArm):
 
     def test_rule_special_register(self):
         self.interp.check_arguments(special_registers=('PSR', 'APSR', 'IPSR', 'EPSR',
-                                                       'PRIMASK', 'FAULTMASL', 'BASEPRI',
+                                                       'PRIMASK', 'FAULTMASK', 'BASEPRI',
                                                        'CONTROL'))
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(special_registers=('R0'))
