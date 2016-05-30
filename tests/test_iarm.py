@@ -78,25 +78,25 @@ class TestArmRules(TestArm):
         self.assertIn('greater', str(cm.exception))
 
     def test_parameter_not_an_immediate(self):
-        with self.assertRaises(iarm.exceptions.RuleError) as cm:
+        with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(imm8=('R4',))
 
     @unittest.skip('Currently there are no instructions to test that raise this type of exception')
     def test_parameter_not_an_immediate_unsigned(self):
-        with self.assertRaises(iarm.exceptions.RuleError) as cm:
+        with self.assertRaises(iarm.exceptions.RuleError):
             pass
 
     def test_parameter_immediate_out_of_range(self):
-        with self.assertRaises(iarm.exceptions.RuleError) as cm:
+        with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(imm8=('#1234',))
 
     def test_parameter_immediate_not_multiple_of(self):
-        with self.assertRaises(iarm.exceptions.RuleError) as cm:
+        with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(imm6_2=('#3',))
             self.interp.check_arguments(imm7_4=('#6',))
 
     def test_parameter_low_register(self):
-        with self.assertRaises(iarm.exceptions.RuleError) as cm:
+        with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(low_registers=('R8',))
 
 
@@ -200,7 +200,7 @@ class TestArmArithmetic(TestArm):
         # TODO test other cases
 
 
-class TestArmLinkedRegisters(TestArm):
+class TestArmRegisters(TestArm):
     """
     Make sure that PC, LR, and SP are linked to R15, R14, and R13 respectively
     """
