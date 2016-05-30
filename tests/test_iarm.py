@@ -58,6 +58,53 @@ class TestArmValidation(TestArm):
             self.interp.evaluate(' BADINST')
 
 
+class TestArmChecks(TestArm):
+    def test_is_register(self):
+        self.assertTrue(self.interp.is_register('R0'))
+        self.assertTrue(self.interp.is_register('R0xF'))
+        self.assertFalse(self.interp.is_register('#0'))
+        self.assertFalse(self.interp.is_register('#0x1'))
+
+    def test_is_immediate(self):
+        self.assertFalse(self.interp.is_immediate('R0'))
+        self.assertFalse(self.interp.is_immediate('R0xF'))
+        self.assertTrue(self.interp.is_immediate('#0'))
+        self.assertTrue(self.interp.is_immediate('#0x1'))
+
+    def test_check_register(self):
+        self.assertEqual(self.interp.check_register('R0'), 0)
+        self.assertEqual(self.interp.check_register('R1'), 1)
+        self.assertEqual(self.interp.check_register('R15'), 15)
+        self.assertEqual(self.interp.check_register('R0x5'), 5)
+        self.assertEqual(self.interp.check_register('R0xE'), 14)
+
+    def test_check_immediate(self):
+        self.assertEqual(self.interp.check_immediate('#0'), 0)
+        self.assertEqual(self.interp.check_immediate('#1'), 1)
+        self.assertEqual(self.interp.check_immediate('#15'), 15)
+        self.assertEqual(self.interp.check_immediate('#0x5'), 5)
+        self.assertEqual(self.interp.check_immediate('#0x70'), 128)
+
+    @unittest.skip("How to best test this")
+    def test_check_immediate_unsiged_value(self):
+        self.fail("How to best test this")
+
+    @unittest.skip("How to best test this")
+    def test_check_immediate_value(self):
+        self.fail("How to best test this")
+
+    def test_check_multiple_of(self):
+        self.interp.check_multiple_of(0, 2)
+        self.interp.check_multiple_of(8, 4)
+        self.interp.check_multiple_of(64, 8)
+        self.interp.check_multiple_of(1234, 2)
+        self.interp.check_multiple_of(6, 3)
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_multiple_of(1, 2)
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_multiple_of(4, 3)
+
+
 class TestArmRules(TestArm):
     """
     Test all validation rules
@@ -119,6 +166,7 @@ class TestArmRules(TestArm):
             self.interp.check_arguments(general_purpose_registers=('#1',))
 
     def test_rule_any_register(self):
+        # TODO does this also mean PC, LR, and SP?
         self.interp.check_arguments(any_registers=('R0', 'R15'))
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(any_registers=('R16',))
@@ -208,6 +256,25 @@ class TestArmRules(TestArm):
     def test_rule_immS25_2(self):
         # TODO how is a negative number encoded?
         self.fail("Not sure how to encode negative numbers")
+
+    def test_rule_special_register(self):
+        self.interp.check_arguments(special_registers=('PSR', 'APSR', 'IPSR', 'EPSR',
+                                                       'PRIMASK', 'FAULTMASL', 'BASEPRI',
+                                                       'CONTROL'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(special_registers=('R0'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(special_registers=('#0'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(special_registers=('R15'))
+
+    def test_rule_LR_or_general_purpose_registers(self):
+        self.interp.check_arguments(LR_or_general_purpose_registers=('R0', 'R1', 'R12', 'LR'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(LR_or_general_purpose_registers=('R13',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(LR_or_general_purpose_registers=('#1',))
+
 
 class TestArmArithmetic(TestArm):
     """
@@ -345,6 +412,26 @@ class TestArmRegisters(TestArm):
         self.assertEqual(self.interp.register[REG1], 1)
         self.interp.register[REG1] = random.randint(0, 2 ** self.interp._bit_width - 1)
         self.assertEqual(self.interp.register[REG1], self.interp.register[REG2])
+
+    def test_set_APSR_flag_to_value(self):
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_APSR_flag_to_value('N', 1)
+        self.assertEqual(self.interp.register['APSR'], (0b1000 << 28))
+        self.interp.set_APSR_flag_to_value('N', 0)
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_APSR_flag_to_value('N', 1)
+        self.interp.set_APSR_flag_to_value('Z', 1)
+        self.assertEqual(self.interp.register['APSR'], (0b1100 << 28))
+        self.interp.set_APSR_flag_to_value('C', 1)
+        self.interp.set_APSR_flag_to_value('V', 1)
+        self.assertEqual(self.interp.register['APSR'], (0b1111 << 28))
+        self.interp.set_APSR_flag_to_value('N', 0)
+        self.assertEqual(self.interp.register['APSR'], (0b0111 << 28))
+        self.interp.set_APSR_flag_to_value('V', 0)
+        self.assertEqual(self.interp.register['APSR'], (0b0110 << 28))
+        self.interp.set_APSR_flag_to_value('Z', 0)
+        self.interp.set_APSR_flag_to_value('C', 0)
+        self.assertEqual(self.interp.register['APSR'], 0)
 
 
 class TestArmDataMovement(TestArm):
