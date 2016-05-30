@@ -9,6 +9,8 @@ class _Meta(iarm.cpu.RegisterCpu):
     """
     REGISTER_REGEX = r'R(\d*)'
     IMMEDIATE_REGEX = r'#(\d*)'
+    TWO_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
+    THREE_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
 
     def parse_lines(self, code):
         """
@@ -155,7 +157,7 @@ class _Meta(iarm.cpu.RegisterCpu):
             raise iarm.exceptions.RuleError(
                 "Register {} is not a general purpose register".format(arg))
 
-    def rule_any_register(self, arg):
+    def rule_any_registers(self, arg):
         """Any register R0 - R15"""
         self.check_register(arg)
 
@@ -287,13 +289,13 @@ class _Meta(iarm.cpu.RegisterCpu):
         if (arg != 'LR') and (arg != 'R14'):
             self.check_arguments(general_purpose_registers=(arg,))
 
-    def set_NZ_flags(self, register):
+    def set_NZ_flags(self, value):
         """Set N and Z flags based on the value of the register"""
         # TODO make this a value, not a register
-        if self.register[register] < 0:
+        if value < 0:
             self.set_APSR_flag_to_value('N', 1)
             self.set_APSR_flag_to_value('Z', 0)
-        elif self.register[register] == 0:
+        elif value == 0:
             self.set_APSR_flag_to_value('N', 0)
             self.set_APSR_flag_to_value('Z', 1)
         else:
@@ -303,12 +305,4 @@ class _Meta(iarm.cpu.RegisterCpu):
     def set_NZCV_flags(self, old_val, new_val):
         """Set N and Z flags based on the value of the register"""
         # TODO figure out how to get C and V flags
-        if new_val < 0:
-            self.set_APSR_flag_to_value('N', 1)
-            self.set_APSR_flag_to_value('Z', 0)
-        elif new_val == 0:
-            self.set_APSR_flag_to_value('N', 0)
-            self.set_APSR_flag_to_value('Z', 1)
-        else:
-            self.set_APSR_flag_to_value('N', 0)
-            self.set_APSR_flag_to_value('Z', 0)
+        self.set_NZ_flags(new_val)

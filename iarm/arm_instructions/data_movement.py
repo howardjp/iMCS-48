@@ -9,9 +9,9 @@ from ._meta import _Meta
 
 class DataMovement(_Meta):
     def MOV(self, params):
-        Rx, Ry = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Rx, Ry = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
-        self.check_arguments(any_register=(Rx, Ry))
+        self.check_arguments(any_registers=(Rx, Ry))
 
         def MOV_func():
             self.register[Rx] = self.register[Ry]
@@ -19,7 +19,7 @@ class DataMovement(_Meta):
         return MOV_func
 
     def MOVS(self, params):
-        Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_immediate(Rb):
             self.check_arguments(low_registers=[Ra], imm8=[Rb])
@@ -28,7 +28,7 @@ class DataMovement(_Meta):
                 self.register[Ra] = int(Rb[1:])
 
                 # Set N and Z status flags
-                self.set_NZ_flags(Ra)
+                self.set_NZ_flags(self.register[Ra])
 
             return MOVS_func
         elif self.is_register(Rb):
@@ -37,14 +37,14 @@ class DataMovement(_Meta):
             def MOVS_func():
                 self.register[Ra] = self.register[Rb]
 
-                self.set_NZ_flags(Ra)
+                self.set_NZ_flags(self.register[Ra])
 
             return MOVS_func
         else:
             raise iarm.exceptions.ParsingError("Unknown parameter: {}".format(Rb))
 
     def MRS(self, params):
-        Rj, Rspecial = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Rj, Rspecial = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(LR_or_general_purpose_registers=(Rj,), special_registers=(Rspecial,))
 
@@ -59,7 +59,7 @@ class DataMovement(_Meta):
         return MRS_func
 
     def MSR(self, params):
-        Rspecial, Rj = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Rspecial, Rj = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(LR_or_general_purpose_registers=(Rj,), special_registers=(Rspecial,))
 
@@ -77,18 +77,18 @@ class DataMovement(_Meta):
         return MSR_func
 
     def MVNS(self, params):
-        Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb))
 
         def MVNS_func():
             self.register[Ra] = ~self.register[Rb]
-            self.set_NZ_flags(Ra)
+            self.set_NZ_flags(self.register[Ra])
 
         return MVNS_func
 
     def REV(self, params):
-        Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb))
 
@@ -98,7 +98,7 @@ class DataMovement(_Meta):
         return REV_func
 
     def REV16(self, params):
-        Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb))
 
