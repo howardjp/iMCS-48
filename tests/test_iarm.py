@@ -95,10 +95,119 @@ class TestArmRules(TestArm):
             self.interp.check_arguments(imm6_2=('#3',))
             self.interp.check_arguments(imm7_4=('#6',))
 
-    def test_parameter_low_register(self):
+    def test_rule_low_register(self):
+        self.interp.check_arguments(low_registers=('R0', 'R7'))
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(low_registers=('R8',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(low_registers=('#1',))
 
+    def test_rule_high_register(self):
+        self.interp.check_arguments(high_registers=('R8', 'R12'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(high_registers=('R0',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(high_registers=('R13',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(high_registers=('#1',))
+
+    def test_rule_general_purpose_register(self):
+        self.interp.check_arguments(general_purpose_registers=('R0', 'R12'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(general_purpose_registers=('R13',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(general_purpose_registers=('#1',))
+
+    def test_rule_any_register(self):
+        self.interp.check_arguments(any_registers=('R0', 'R15'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(any_registers=('R16',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(any_registers=('#1',))
+
+    def test_rule_imm3(self):
+        self.interp.check_arguments(imm3=('#0', '#1', '#7', '#0x2'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm3=('R0',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm3=('#8',))
+
+    def test_rule_imm5(self):
+        self.interp.check_arguments(imm5=('#0', '#1', '#31', '#0xF'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm5=('R0',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm5=('#32',))
+
+    def test_rule_imm5_counting(self):
+        self.interp.check_arguments(imm5_counting=('#1', '#31', '#0xE'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm5_counting=('R0',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm5_counting=('#32',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm5_counting=('#0',))
+
+    def test_rule_imm6_2(self):
+        self.interp.check_arguments(imm6_2=('#0', '#2', '#62', '#0xC'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm6_2=('R0',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm6_2=('#1',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm6_2=('#63',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm6_2=('#64',))
+
+    def test_rule_imm7_4(self):
+        self.interp.check_arguments(imm7_4=('#0', '#4', '#124', '#0x14'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm7_4=('R0',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm7_4=('#1',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm7_4=('#127',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm7_4=('#128',))
+
+    def test_rule_imm8(self):
+        self.interp.check_arguments(imm8=('#0', '#1', '#255', '#0xF1'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm8=('R0',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm8=('#256',))
+
+    @unittest.skip("Not sure how to encode negative numbers")
+    def test_rule_immS8_2(self):
+        # TODO how is a negative number encoded?
+        self.fail("Not sure how to encode negative numbers")
+
+    def test_rule_imm9_4(self):
+        self.interp.check_arguments(imm9_4=('#0', '#4', '#508', '#0x100'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm9_4=('R0',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm9_4=('#1',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm9_4=('#511',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm9_4=('#512',))
+
+    def test_rule_imm10_4(self):
+        self.interp.check_arguments(imm10_4=('#0', '#4', '#1020', '#0xA04'))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm10_4=('R0',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm10_4=('#1',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm10_4=('#1023',))
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_arguments(imm10_4=('#1024',))
+
+    @unittest.skip("Not sure how to encode negative numbers")
+    def test_rule_immS25_2(self):
+        # TODO how is a negative number encoded?
+        self.fail("Not sure how to encode negative numbers")
 
 class TestArmArithmetic(TestArm):
     """
