@@ -11,7 +11,6 @@ class Arithmetic(_Meta):
         def ADCS_func():
             self.register[Ra] = self.register[Rb] + self.register[Rc]
             self.register[Ra] += 1 if (self.register['APSR'] & (1 << 29)) else 0
-            self.register[Ra] &= 0xFFFFFFFF  # Make sure we are within bounds
             self.set_NZCV_flags(self.register[Rb], self.register[Ra])
 
         return ADCS_func

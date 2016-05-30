@@ -122,5 +122,5 @@ class RandomValueDict(dict):
         # TODO if 'a' and 'b' are linked, and 'b' and 'c' are linked, updaing 'c' does not update 'a'
         if key in self._linked_keys.keys():
             key2 = self._linked_keys[key]
-            super().__setitem__(key2, value)
-        super().__setitem__(key, value)
+            super().__setitem__(key2, value & 2**self._bit_width - 1)
+        super().__setitem__(key, value & 2**self._bit_width - 1)
