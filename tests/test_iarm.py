@@ -286,7 +286,7 @@ class TestArmDataMovement(TestArm):
         self.interp.evaluate(" MOVS R0, R1")
         self.interp.run()
 
-        self.assertEqual(self.interp.register['R0'], -1)
+        self.assertEqual(self.interp.register['R0'], -1 & 2**self.interp._bit_width-1)
         self.assertFalse(self.interp.register['APSR'] & (1 << 30))
         self.assertTrue(self.interp.register['APSR'] & (1 << 31))
 
@@ -355,7 +355,7 @@ class TestArmDataMovement(TestArm):
         self.interp.run()
 
         self.assertEqual(self.interp.register['R1'], 4)
-        self.assertEqual(self.interp.register['R2'], -5)
+        self.assertEqual(self.interp.register['R2'], -5 & 2**self.interp._bit_width-1)
 
     def test_MVNS_high_register(self):
         with self.assertRaises(iarm.exceptions.RuleError):
