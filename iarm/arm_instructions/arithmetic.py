@@ -11,7 +11,7 @@ class Arithmetic(_Meta):
         def ADCS_func():
             self.register[Ra] = self.register[Rb] + self.register[Rc]
             self.register[Ra] += 1 if (self.register['APSR'] & (1 << 29)) else 0
-            self.set_NZCV_flags(self.register[Rb], self.register[Ra])
+            self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'add')
 
         return ADCS_func
 
@@ -52,21 +52,21 @@ class Arithmetic(_Meta):
 
             def ADDS_func():
                 self.register[Ra] = self.register[Rb] + self.register[Rc]
-                self.set_NZCV_flags(self.register[Rb], self.register[Ra])
+                self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'add')
         elif Ra == Rb:
             # ADDS Ra, Ra, #imm8
             self.check_arguments(low_registers=(Ra,), imm8=(Rc,))
 
             def ADDS_func():
                 self.register[Ra] = self.register[Rb] + int(Rc[1:])
-                self.set_NZCV_flags(self.register[Rb], self.register[Ra])
+                self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'add')
         else:
             # ADDS Ra, Rb, #imm3
             self.check_arguments(low_registers=(Ra, Rb), imm3=(Rc,))
 
             def ADDS_func():
                 self.register[Ra] = self.register[Rb] + int(Rc[1:])
-                self.set_NZCV_flags(self.register[Rb], self.register[Ra])
+                self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'add')
 
         return ADDS_func
 
@@ -76,8 +76,8 @@ class Arithmetic(_Meta):
         self.check_arguments(low_registers=(Ra, Rb))
 
         def CMN_func():
-            # TODO add the two but dont store result
-            self.set_NZCV_flags(self.register[Ra], self.register[Ra] + self.register[Rb])
+            self.set_NZCV_flags(self.register[Ra], self.register[Rb],
+                                self.register[Ra] + self.register[Rb], 'add')
 
         return CMN_func
 

@@ -289,20 +289,63 @@ class _Meta(iarm.cpu.RegisterCpu):
         if (arg != 'LR') and (arg != 'R14'):
             self.check_arguments(general_purpose_registers=(arg,))
 
-    def set_NZ_flags(self, value):
-        """Set N and Z flags based on the value of the register"""
-        # TODO make this a value, not a register
-        if value < 0:
+    def set_N_flag(self, result):
+        if result & (1 << self._bit_width - 1):
             self.set_APSR_flag_to_value('N', 1)
-            self.set_APSR_flag_to_value('Z', 0)
-        elif value == 0:
-            self.set_APSR_flag_to_value('N', 0)
-            self.set_APSR_flag_to_value('Z', 1)
         else:
             self.set_APSR_flag_to_value('N', 0)
+
+    def set_Z_flag(self, result):
+        if result == 0:
+            self.set_APSR_flag_to_value('Z', 1)
+        else:
             self.set_APSR_flag_to_value('Z', 0)
 
-    def set_NZCV_flags(self, old_val, new_val):
-        """Set N and Z flags based on the value of the register"""
-        # TODO figure out how to get C and V flags
-        self.set_NZ_flags(new_val)
+    def set_C_flag(self, oper_1, oper_2, result, type):
+        """
+        Set C flag
+        C flag is set if the unsigned number overflows
+        This condition is obtained if:
+        1. In addition, the result is smaller than either of the operands
+        2. In subtraction, if the second operand is larger than the first
+
+        This should not be used for shifting as each shift will need to set
+        the C flag differently
+        """
+        # TODO is this correct?
+        if type == 'add':
+            if result < oper_1:
+                self.set_APSR_flag_to_value('C', 1)
+            else:
+                self.set_APSR_flag_to_value('C', 0)
+        elif type == 'sub':
+            if oper_1 < oper_2:
+                # If there was a borrow, then set to zero
+                self.set_APSR_flag_to_value('C', 0)
+            else:
+                self.set_APSR_flag_to_value('C', 1)
+        elif type == 'shift-left':
+            if (oper_2 > 0) and (oper_2 < (self._bit_width - 1)):
+                self.set_APSR_flag_to_value('C', oper_1 & (1 << (self._bit_width - oper_2)))
+            else:
+                self.set_APSR_flag_to_value('C', 0)
+
+    def set_V_flag(self, oper_1, oper_2, result):
+        # Set the V flag
+        if (oper_1 & (1 << self._bit_width - 1)) and (oper_2 & (1 << self._bit_width - 1)) \
+                and not (result & (1 << self._bit_width - 1)):
+            self.set_APSR_flag_to_value('V', 1)
+        elif not (oper_1 & (1 << self._bit_width - 1)) and not (oper_2 & (1 << self._bit_width - 1)) \
+                and (result & (1 << self._bit_width - 1)):
+            self.set_APSR_flag_to_value('V', 1)
+        else:
+            self.set_APSR_flag_to_value('V', 0)
+
+    def set_NZ_flags(self, result):
+        self.set_N_flag(result)
+        self.set_Z_flag(result)
+
+    def set_NZCV_flags(self, oper_1, oper_2, result, _type):
+        self.set_NZ_flags(result)
+        self.set_C_flag(oper_1, oper_2, result, _type)
+        self.set_V_flag(oper_1, oper_2, result)
