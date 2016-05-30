@@ -105,6 +105,55 @@ class TestArmArithmetic(TestArm):
     Test all arithmetic instructions
     """
 
+    def test_ADCS(self):
+        self.interp.register['R0'] = 1
+        self.interp.register['R1'] = 2
+        self.interp.register['R2'] = 3
+
+        self.interp.evaluate(" ADCS R0, R1, R2")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 5)
+        # TODO check for status registers
+        # TODO check for carry bit
+
+    def test_ADD(self):
+        self.interp.register['R0'] = 1
+        self.interp.register['R1'] = 2
+        self.interp.register['R2'] = 3
+
+        self.interp.evaluate(" ADD R0, R1, R2")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 5)
+
+    def test_ADD_PC(self):
+        self.interp.register['R0'] = 1
+        self.interp.register['PC'] = 2
+
+        self.interp.evaluate(" ADD R0, PC, #5")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 7)
+
+    def test_ADD_SP(self):
+        self.interp.register['SP'] = 1
+
+        self.interp.evaluate(" ADD SP, SP, #5")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 6)
+
+    def test_CMN(self):
+        self.interp.register['R0'] = 0
+        self.interp.register['R1'] = 0
+
+        self.interp.evaluate(" CMN R0, R1")
+        self.interp.run()
+
+        self.assertTrue(self.interp.register['APSR'] & (1 << 30))
+        # TODO test other cases
+
 
 class TestArmLinkedRegisters(TestArm):
     """
