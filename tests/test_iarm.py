@@ -433,6 +433,103 @@ class TestArmRegisters(TestArm):
         self.interp.set_APSR_flag_to_value('C', 0)
         self.assertEqual(self.interp.register['APSR'], 0)
 
+    def test_set_N_flag(self):
+        self.interp.set_N_flag(-1 & (2**self.interp._bit_width - 1))
+        self.assertEqual(self.interp.register['APSR'], (1 << 31))
+        self.interp.set_N_flag(0)
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_N_flag(1)
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_N_flag(2**self.interp._bit_width - 1)
+        self.assertEqual(self.interp.register['APSR'], 1 << 31)
+        self.interp.set_N_flag(2 ** (self.interp._bit_width - 2))
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_N_flag(-2**(self.interp._bit_width - 2) & (2**self.interp._bit_width - 1))
+        self.assertEqual(self.interp.register['APSR'], (1 << 31))
+
+    def test_set_Z_flag(self):
+        self.interp.set_Z_flag(-1 & (2**self.interp._bit_width - 1))
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_Z_flag(0)
+        self.assertEqual(self.interp.register['APSR'], (1 << 30))
+        self.interp.set_Z_flag(1)
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_Z_flag(2**self.interp._bit_width - 1)
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_Z_flag((2**self.interp._bit_width - 1) & (2**self.interp._bit_width - 1))
+        self.assertEqual(self.interp.register['APSR'], 0)
+
+    def test_set_C_flag(self):
+        self.interp.set_C_flag(1, 2**self.interp._bit_width - 1, 0, 'add')
+        self.assertEqual(self.interp.register['APSR'], (1 << 29))
+        self.interp.set_C_flag(1, 1, 2, 'add')
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_C_flag(2 ** self.interp._bit_width - 2, 3, 1, 'add')
+        self.assertEqual(self.interp.register['APSR'], (1 << 29))
+        self.interp.set_C_flag(0, 0, 0, 'add')
+        self.assertEqual(self.interp.register['APSR'], 0)
+
+        self.interp.set_C_flag(0, 1, 2**self.interp._bit_width - 1, 'sub')
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_C_flag(2, 1, 1, 'sub')
+        self.assertEqual(self.interp.register['APSR'], 1 << 29)
+        self.interp.set_C_flag(1, 18, -17 & (2**self.interp._bit_width - 1), 'sub')
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_C_flag(1, 1, 0, 'sub')
+        self.assertEqual(self.interp.register['APSR'], 1 << 29)
+        self.interp.set_C_flag(0, 0, 0, 'sub')
+        self.assertEqual(self.interp.register['APSR'], 1 << 29)
+
+    def test_set_V_flag(self):
+        self.interp.set_V_flag(1, 1, 2, 'add')
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_V_flag(0x40000000, 0x40000000, 0x80000000, 'add')
+        self.assertEqual(self.interp.register['APSR'], 1 << 28)
+        self.interp.set_V_flag(0xFFFFFFFF, 0x80000000, 0x7FFFFFFF, 'add')
+        self.assertEqual(self.interp.register['APSR'], 1 << 28)
+
+        self.interp.set_V_flag(1, 1, 0, 'sub')
+        self.assertEqual(self.interp.register['APSR'], 0)
+        self.interp.set_V_flag(0x7FFFFFFF, 0xFFFFFFFF, 0x80000000, 'sub')
+        self.assertEqual(self.interp.register['APSR'], 1 << 28)
+
+    def test_set_NZCV_flags(self):
+        # Table taken from
+        # http://stackoverflow.com/questions/8965923/carry-overflow-subtraction-in-x86
+        x7F = 0x7FFFFFFF
+        xFF = 0xFFFFFFFF
+        x80 = 0x80000000
+        xFE = 0xFFFFFFFE
+        x7E = 0x7FFFFFFE
+        add_test_table = [
+            [x7F, 0x0, x7F, 0],
+            [xFF, x7F, x7E, 0b0010 << 28],  # C
+            [0x0, 0x0, 0x0, 0b0100 << 28],  # Z
+            [xFF, 0x1, 0x0, 0b0110 << 28],  # ZC
+            [xFF, 0x0, xFF, 0b1000 << 28],  # N
+            [xFF, xFF, xFE, 0b1010 << 28],  # NC
+            [xFF, x80, x7F, 0b0011 << 28],  # CV
+            [x80, x80, 0x0, 0b0111 << 28],  # ZCV
+            [x7F, x7F, xFE, 0b1001 << 28]   # NV
+        ]
+        sub_test_table = [
+            [xFF, xFE, 0x1, 0b0010 << 28],  # The carry bit is set when we did not borrow
+            [x7E, xFF, x7F, 0],  # C (we borrowed
+            [xFF, xFF, 0x0, 0b0110 << 28],  # Z
+            [xFF, x7F, x80, 0b1010 << 28],  # N
+            [xFE, xFF, xFF, 0b1000 << 28],  # NC
+            [xFE, x7F, x7F, 0b0011 << 28],  # V
+            [x7F, xFF, x80, 0b1001 << 28]   # NCV
+        ]
+        for row in add_test_table:
+            self.interp.set_NZCV_flags(row[0], row[1], row[2], 'add')
+            self.assertEqual(self.interp.register['APSR'], row[3],
+                             msg="Fail with {0:X} + {0:X} = {0:X}; {0:X}".format(row[0], row[1], row[2], row[3]))
+
+        for row in sub_test_table:
+            self.interp.set_NZCV_flags(row[0], row[1], row[2], 'sub')
+            self.assertEqual(self.interp.register['APSR'], row[3])
+
 
 class TestArmDataMovement(TestArm):
     def test_MOV(self):

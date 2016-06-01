@@ -330,14 +330,17 @@ class _Meta(iarm.cpu.RegisterCpu):
             else:
                 self.set_APSR_flag_to_value('C', 0)
 
-    def set_V_flag(self, oper_1, oper_2, result):
+    def set_V_flag(self, oper_1, oper_2, result, _type):
         # Set the V flag
-        if (oper_1 & (1 << self._bit_width - 1)) and (oper_2 & (1 << self._bit_width - 1)) \
-                and not (result & (1 << self._bit_width - 1)):
-            self.set_APSR_flag_to_value('V', 1)
-        elif not (oper_1 & (1 << self._bit_width - 1)) and not (oper_2 & (1 << self._bit_width - 1)) \
-                and (result & (1 << self._bit_width - 1)):
-            self.set_APSR_flag_to_value('V', 1)
+        if _type == 'sub':
+            oper_2 = (~oper_2 & (2**self._bit_width - 1)) + 1
+
+        if (oper_1 + oper_2) >= (1 << 31):
+            if ((oper_1 & (1 << self._bit_width - 1)) and (oper_2 & (1 << self._bit_width - 1)) and not (result & (1 << self._bit_width - 1))) or \
+               (not (oper_1 & (1 << self._bit_width - 1)) and not (oper_2 & (1 << self._bit_width - 1)) and (result & (1 << self._bit_width - 1))):
+                self.set_APSR_flag_to_value('V', 1)
+            else:
+                self.set_APSR_flag_to_value('V', 0)
         else:
             self.set_APSR_flag_to_value('V', 0)
 
@@ -348,4 +351,4 @@ class _Meta(iarm.cpu.RegisterCpu):
     def set_NZCV_flags(self, oper_1, oper_2, result, _type):
         self.set_NZ_flags(result)
         self.set_C_flag(oper_1, oper_2, result, _type)
-        self.set_V_flag(oper_1, oper_2, result)
+        self.set_V_flag(oper_1, oper_2, result, _type)
