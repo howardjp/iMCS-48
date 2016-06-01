@@ -113,6 +113,8 @@ class DataMovement(_Meta):
 
         raise iarm.exceptions.NotImplementedError
 
+        self.check_arguments(low_registers=(Ra, Rb))
+
         def REVSH_func():
             raise NotImplementedError
 
@@ -121,39 +123,45 @@ class DataMovement(_Meta):
     def SXTB(self, params):
         Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rb))
 
         def SXTB_func():
-            raise NotImplementedError
+            if self.register[Rb] & (1 << 7):
+                self.register[Ra] = 0xFFFFFF00 + (self.register[Rb] & 0xFF)
+            else:
+                self.register[Ra] = (self.register[Rb] & 0xFF)
 
         return SXTB_func
 
     def SXTH(self, params):
         Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rb))
 
         def SXTH_func():
-            raise NotImplementedError
+            if self.register[Rb] & (1 << 15):
+                self.register[Ra] = 0xFFFF0000 + (self.register[Rb] & 0xFFFF)
+            else:
+                self.register[Ra] = (self.register[Rb] & 0xFFFF)
 
         return SXTH_func
 
     def UXTB(self, params):
         Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rb))
 
         def UXTB_func():
-            raise NotImplementedError
+            self.register[Ra] = (self.register[Rb] & 0xFF)
 
         return UXTB_func
 
     def UXTH(self, params):
         Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rb))
 
         def UXTH_func():
-            raise NotImplementedError
+            self.register[Ra] = (self.register[Rb] & 0xFFFF)
 
         return UXTH_func
