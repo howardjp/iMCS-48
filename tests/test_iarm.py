@@ -77,13 +77,17 @@ class TestArmChecks(TestArm):
         self.assertEqual(self.interp.check_register('R15'), 15)
         self.assertEqual(self.interp.check_register('R0x5'), 5)
         self.assertEqual(self.interp.check_register('R0xE'), 14)
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_register('R')
 
     def test_check_immediate(self):
         self.assertEqual(self.interp.check_immediate('#0'), 0)
         self.assertEqual(self.interp.check_immediate('#1'), 1)
         self.assertEqual(self.interp.check_immediate('#15'), 15)
         self.assertEqual(self.interp.check_immediate('#0x5'), 5)
-        self.assertEqual(self.interp.check_immediate('#0x70'), 128)
+        self.assertEqual(self.interp.check_immediate('#0x70'), 112)
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.check_register('#')
 
     @unittest.skip("How to best test this")
     def test_check_immediate_unsiged_value(self):
@@ -242,7 +246,7 @@ class TestArmRules(TestArm):
             self.interp.check_arguments(imm9_4=('#512',))
 
     def test_rule_imm10_4(self):
-        self.interp.check_arguments(imm10_4=('#0', '#4', '#1020', '#0xA04'))
+        self.interp.check_arguments(imm10_4=('#0', '#4', '#1020', '#0x3f8'))
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(imm10_4=('R0',))
         with self.assertRaises(iarm.exceptions.RuleError):
@@ -514,7 +518,7 @@ class TestArmRegisters(TestArm):
         ]
         sub_test_table = [
             [xFF, xFE, 0x1, 0b0010 << 28],  # The carry bit is set when we did not borrow
-            [x7E, xFF, x7F, 0],  # C (we borrowed
+            [x7E, xFF, x7F, 0],  # C (we borrowed)
             [xFF, xFF, 0x0, 0b0110 << 28],  # Z
             [xFF, x7F, x80, 0b1010 << 28],  # N
             [xFE, xFF, xFF, 0b1000 << 28],  # NC
