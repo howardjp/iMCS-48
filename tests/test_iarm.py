@@ -379,66 +379,6 @@ class TestArmArithmetic(TestArm):
         self.assertTrue(self.interp.register['APSR'] & (1 << 30))
         # TODO test other cases
 
-    def test_SXTB(self):
-        test_set = [[0, 0],
-                    [1, 1],
-                    [127, 127],
-                    [128, 0xFFFFFF80],
-                    [255, 0xFFFFFFFF],
-                    [256, 0]]
-
-        for row in test_set:
-            self.interp.register['R1'] = row[0]
-            self.interp.evaluate(" SXTB R0, R1")
-            self.interp.run()
-
-            self.assertEqual(self.interp.register['R0'], row[1])
-
-    def test_SXTH(self):
-        test_set = [[0, 0],
-                    [1, 1],
-                    [32767, 32767],
-                    [32768, 0xFFFF8000],
-                    [65535, 0xFFFFFFFF],
-                    [65536, 0]]
-
-        for row in test_set:
-            self.interp.register['R1'] = row[0]
-            self.interp.evaluate(" SXTH R0, R1")
-            self.interp.run()
-
-            self.assertEqual(self.interp.register['R0'], row[1])
-
-    def test_UXTB(self):
-        test_set = [[0, 0],
-                    [1, 1],
-                    [127, 127],
-                    [128, 128],
-                    [255, 255],
-                    [256, 0]]
-
-        for row in test_set:
-            self.interp.register['R1'] = row[0]
-            self.interp.evaluate(" UXTB R0, R1")
-            self.interp.run()
-
-            self.assertEqual(self.interp.register['R0'], row[1])
-
-    def test_UXTH(self):
-        test_set = [[0, 0],
-                    [1, 1],
-                    [32767, 32767],
-                    [32768, 32768],
-                    [65535, 65535],
-                    [65536, 0]]
-
-        for row in test_set:
-            self.interp.register['R1'] = row[0]
-            self.interp.evaluate(" UXTH R0, R1")
-            self.interp.run()
-
-            self.assertEqual(self.interp.register['R0'], row[1])
-
 
 class TestArmRegisters(TestArm):
     """
@@ -745,6 +685,66 @@ class TestArmDataMovement(TestArm):
     def test_REV16_high_register(self):
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.evaluate(" REV R2, R11")
+
+    def test_SXTB(self):
+        test_set = [[0, 0],
+                    [1, 1],
+                    [127, 127],
+                    [128, 0xFFFFFF80],
+                    [255, 0xFFFFFFFF],
+                    [256, 0]]
+
+        for row in test_set:
+            self.interp.register['R1'] = row[0]
+            self.interp.evaluate(" SXTB R0, R1")
+            self.interp.run()
+
+            self.assertEqual(self.interp.register['R0'], row[1])
+
+    def test_SXTH(self):
+        test_set = [[0, 0],
+                    [1, 1],
+                    [32767, 32767],
+                    [32768, 0xFFFF8000],
+                    [65535, 0xFFFFFFFF],
+                    [65536, 0]]
+
+        for row in test_set:
+            self.interp.register['R1'] = row[0]
+            self.interp.evaluate(" SXTH R0, R1")
+            self.interp.run()
+
+            self.assertEqual(self.interp.register['R0'], row[1])
+
+    def test_UXTB(self):
+        test_set = [[0, 0],
+                    [1, 1],
+                    [127, 127],
+                    [128, 128],
+                    [255, 255],
+                    [256, 0]]
+
+        for row in test_set:
+            self.interp.register['R1'] = row[0]
+            self.interp.evaluate(" UXTB R0, R1")
+            self.interp.run()
+
+            self.assertEqual(self.interp.register['R0'], row[1])
+
+    def test_UXTH(self):
+        test_set = [[0, 0],
+                    [1, 1],
+                    [32767, 32767],
+                    [32768, 32768],
+                    [65535, 65535],
+                    [65536, 0]]
+
+        for row in test_set:
+            self.interp.register['R1'] = row[0]
+            self.interp.evaluate(" UXTH R0, R1")
+            self.interp.run()
+
+            self.assertEqual(self.interp.register['R0'], row[1])
 
 if __name__ == '__main_':
     unittest.main()
