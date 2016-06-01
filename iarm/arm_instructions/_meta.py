@@ -7,8 +7,8 @@ class _Meta(iarm.cpu.RegisterCpu):
     """
     Give helper functions to the instructions
     """
-    REGISTER_REGEX = r'R(\d*)'
-    IMMEDIATE_REGEX = r'#(\d*)'
+    REGISTER_REGEX = r'R(0[xX][0-9a-fA-F]+|\d+)'
+    IMMEDIATE_REGEX = r'#(0[xX][0-9a-fA-F]+|\d+)'
     TWO_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
     THREE_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
 
@@ -78,7 +78,10 @@ class _Meta(iarm.cpu.RegisterCpu):
         match = re.search(self.REGISTER_REGEX, arg)
         if match is None:
             raise iarm.exceptions.RuleError("Parameter {} is not a register".format(arg))
-        r_num = int(match.groups()[0])
+        try:
+            r_num = int(match.groups()[0])
+        except ValueError:
+            r_num = int(match.groups()[0], 16)
         if r_num > self._max_registers:
             raise iarm.exceptions.RuleError(
                 "Register {} is greater than defined registers of {}".format(arg, self._max_registers))
@@ -98,7 +101,10 @@ class _Meta(iarm.cpu.RegisterCpu):
         match = re.search(self.IMMEDIATE_REGEX, arg)
         if match is None:
             raise iarm.exceptions.RuleError("Parameter {} is not an immediate".format(arg))
-        return int(match.groups()[0])
+        try:
+            return int(match.groups()[0])
+        except ValueError:
+            return int(match.groups()[0], 16)
 
     def check_immediate_unsigned_value(self, arg, bit):
         """
