@@ -93,7 +93,10 @@ class DataMovement(_Meta):
         self.check_arguments(low_registers=(Ra, Rb))
 
         def REV_func():
-            self.register[Ra] = int('{:032b}'.format(self.register[Rb])[::-1], 2)
+            self.register[Ra] = ((self.register[Rb] & 0xFF000000) >> 24) | \
+                                ((self.register[Rb] & 0x00FF0000) >> 8) | \
+                                ((self.register[Rb] & 0x0000FF00) << 8) | \
+                                ((self.register[Rb] & 0x000000FF) << 24)
 
         return REV_func
 
@@ -103,20 +106,21 @@ class DataMovement(_Meta):
         self.check_arguments(low_registers=(Ra, Rb))
 
         def REV16_func():
-            # TODO is this correct?
-            self.register[Ra] = int('{:016b}'.format(self.register[Rb] & 0xFFFF)[::-1], 2)
+            self.register[Ra] = ((self.register[Rb] & 0xFF00FF00) >> 8) | \
+                                ((self.register[Rb] & 0x00FF00FF) << 8)
 
         return REV16_func
 
     def REVSH(self, params):
         Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
-
         self.check_arguments(low_registers=(Ra, Rb))
 
         def REVSH_func():
-            raise NotImplementedError
+            self.register[Ra] = ((self.register[Rb] & 0x0000FF00) >> 8) | \
+                                ((self.register[Rb] & 0x000000FF) << 8)
+            if self.register[Ra] & (1 << 15):
+                self.register[Ra] |= 0xFFFF0000
 
         return REVSH_func
 
