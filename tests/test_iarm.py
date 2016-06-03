@@ -384,6 +384,34 @@ class TestArmArithmetic(TestArm):
         self.assertTrue(self.interp.register['APSR'] & (1 << 30))
         # TODO test other cases
 
+    def test_CMP(self):
+        self.interp.register['R0'] = 1
+        self.interp.register['R1'] = 1
+
+        self.interp.evaluate(" CMP R0, R1")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['APSR'], 1 << 30)
+        # TODO test other cases
+
+    def test_MULS(self):
+        self.interp.register['R0'] = 2
+        self.interp.register['R1'] = 5
+
+        self.interp.evaluate(" MULS R0, R1, R0")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 10)
+        # TODO test flags
+
+    def test_MULS_rule(self):
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.evaluate(" MULS R0, R1, R2")
+
+    def test_RSBS(self):
+        # TODO write some tests for this
+        pass
+
 
 class TestArmRegisters(TestArm):
     """

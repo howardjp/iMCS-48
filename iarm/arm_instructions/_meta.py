@@ -359,3 +359,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         self.set_NZ_flags(result)
         self.set_C_flag(oper_1, oper_2, result, _type)
         self.set_V_flag(oper_1, oper_2, result, _type)
+
+    def rule_R0_thru_R14(self, arg):
+        if arg not in ('LR', 'R14', 'SP', 'R13'):
+            self.check_arguments(general_purpose_registers=(arg,))

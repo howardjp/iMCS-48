@@ -82,26 +82,38 @@ class Arithmetic(_Meta):
         return CMN_func
 
     def CMP(self, params):
-        Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Rm, Rn = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        if self.is_register(Rn):
+            self.check_arguments(R0_thru_R14=(Rm, Rn))
 
-        def UXTH_func():
-            raise NotImplementedError
+            def CMP_func():
+                self.set_NZCV_flags(self.register[Rm], self.register[Rn],
+                                    self.register[Rm] - self.register[Rn], 'sub')
+        else:
+            self.check_arguments(R0_thru_R14=(Rm,), imm8=(Rn,))
 
-        return UXTH_func
+            def CMP_func():
+                self.set_NZCV_flags(self.register[Rm], int(Rn[1:]),
+                                    self.register[Rm] - int(Rn[1:]), 'sub')
+
+        return CMP_func
 
     def MULS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rb, Rc))
+        if Ra != Rc:
+            raise iarm.exceptions.RuleError("Third parameter {} is not the same as the first parameter {}".format(Rc, Ra))
 
-        def UXTH_func():
-            raise NotImplementedError
+        def MULS_func():
+            self.register[Ra] = self.register[Rb] * self.register[Rc]
+            self.set_NZ_flags(self.register[Ra])
 
-        return UXTH_func
+        return MULS_func
 
     def NOP(self, params):
+        # TODO check for no parameters
         def NOP_func():
             return
         return NOP_func
@@ -109,12 +121,15 @@ class Arithmetic(_Meta):
     def RSBS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rb))
+        if Rc != '#0':
+            raise iarm.exceptions.RuleError("Third parameter {} is not #0".format(Rc))
 
-        def UXTH_func():
-            raise NotImplementedError
+        def RSBS_func():
+            self.register[Ra] = 0 - self.register[Rb]
+            self.set_NZCV_flags(0, self.register[Rb], self.register[Ra], 'sub')
 
-        return UXTH_func
+        return RSBS_func
 
     def SBCS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
