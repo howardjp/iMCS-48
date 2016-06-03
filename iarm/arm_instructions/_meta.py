@@ -336,11 +336,17 @@ class _Meta(iarm.cpu.RegisterCpu):
                 self.set_APSR_flag_to_value('C', oper_1 & (1 << (self._bit_width - oper_2)))
             else:
                 self.set_APSR_flag_to_value('C', 0)
+        else:
+            raise iarm.exceptions.BrainFart("_type is not 'add' or 'sub'")
 
     def set_V_flag(self, oper_1, oper_2, result, _type):
         # Set the V flag
+        if _type == 'add':
+            pass
         if _type == 'sub':
             oper_2 = (~oper_2 & (2**self._bit_width - 1)) + 1
+        else:
+            raise iarm.exceptions.BrainFart("_type is not 'add' or 'sub'")
 
         if (oper_1 + oper_2) >= (1 << 31):
             if ((oper_1 & (1 << self._bit_width - 1)) and (oper_2 & (1 << self._bit_width - 1)) and not (result & (1 << self._bit_width - 1))) or \

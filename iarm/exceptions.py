@@ -21,3 +21,10 @@ class ValidationError(IarmError):
 
 class NotImplementedError(IarmError):
     pass
+
+
+class BrainFart(IarmError):
+    """
+    Errors internal to the program or for those 3AM programming mistakes
+    """
+    pass
