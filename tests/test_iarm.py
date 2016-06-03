@@ -262,9 +262,14 @@ class TestArmRules(TestArm):
         self.fail("Not sure how to encode negative numbers")
 
     def test_rule_special_register(self):
-        self.interp.check_arguments(special_registers=('PSR', 'APSR', 'IPSR', 'EPSR',
-                                                       'PRIMASK', 'FAULTMASK', 'BASEPRI',
-                                                       'CONTROL'))
+        # http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0588b/Cihibbbh.html
+        # TODO This list does not contain the PSR, but is it a valid code to read from?
+        # TODO it's here: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0211k/ch02s08s01.html
+        self.interp.check_arguments(special_registers=('APSR', 'IPSR', 'EPSR', 'IEPSR',
+                                                       'IAPSR', 'EAPSR', 'XPSR', 'MSP',
+                                                       'PSP',
+                                                       'PRIMASK', 'BASEPRI', 'BASEPRI_MAX'
+                                                       'FAULTMASK', 'CONTROL'))
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(special_registers=('R0'))
         with self.assertRaises(iarm.exceptions.RuleError):
