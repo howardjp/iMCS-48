@@ -408,8 +408,24 @@ class TestArmArithmetic(TestArm):
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.evaluate(" MULS R0, R1, R2")
 
+    @unittest.skip("No Test Defined")
     def test_RSBS(self):
         # TODO write some tests for this
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_SBCS(self):
+        # TODO write a test
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_SUB(self):
+        # TODO wrte a test
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_SUBS(self):
+        # TODO write a test
         pass
 
 

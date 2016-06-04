@@ -369,3 +369,6 @@ class _Meta(iarm.cpu.RegisterCpu):
     def rule_R0_thru_R14(self, arg):
         if arg not in ('LR', 'R14', 'SP', 'R13'):
             self.check_arguments(general_purpose_registers=(arg,))
+
+    def is_carry_set(self):
+        return True if (self.register['APSR'] & (1 << 29)) else False

@@ -134,29 +134,56 @@ class Arithmetic(_Meta):
     def SBCS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rb, Rc))
+        if Ra != Rb:
+            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
 
-        def UXTH_func():
-            raise NotImplementedError
+        def SBCS_func():
+            # TODO does setting the flags work here?
+            oper_1 = self.register[Rb]
+            oper_2 = self.register[Rc] + (1 if self.is_carry_set() else 0)
+            self.register[Ra] = self.register[Rb] - oper_2
+            self.set_NZCV_flags(oper_1, oper_2, self.register[Ra], 'sub')
 
-        return UXTH_func
+        return SBCS_func
 
     def SUB(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(imm9_4=(Rc,))
+        if Ra != 'SP':
+            raise iarm.exceptions.RuleError("First parameter {} is not equal to SP".format(Ra))
+        if Rb != 'SP':
+            raise iarm.exceptions.RuleError("Second parameter {} is not equal to SP".format(Rb))
 
-        def UXTH_func():
-            raise NotImplementedError
+        def SUB_func():
+            self.register[Ra] = self.register[Rb] - self.register[Rc]
 
-        return UXTH_func
+        return SUB_func
 
     def SUBS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        if self.is_register(Rc):
+            self.check_arguments(low_registers=(Ra, Rb, Rc))
 
-        def UXTH_func():
-            raise NotImplementedError
+            def SUBS_func():
+                self.register[Ra] = self.register[Rb] - self.register[Rc]
+                self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'sub')
+        else:
+            if Ra == Rb:
+                self.check_arguments(low_registers=(Ra,), imm8=(Rc,))
 
-        return UXTH_func
+                def SUBS_func():
+                    oper_1 = self.register[Ra]
+                    self.register[Ra] = self.register[Ra] - int(Rc[1:])
+                    self.set_NZCV_flags(oper_1, int(Rc[1:]), self.register[Ra], 'sub')
+            else:
+                self.check_arguments(low_registers=(Ra, Rb), imm3=(Rc,))
+
+                def SUBS_func():
+                    oper_1 = self.register[Rb]
+                    self.register[Ra] = self.register[Rb] - int(Rc[1:])
+                    self.set_NZCV_flags(oper_1, int(Rc[1:]), self.register[Ra], 'sub')
+
+        return SUBS_func
