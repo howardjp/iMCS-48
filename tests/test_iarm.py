@@ -261,6 +261,7 @@ class TestArmRules(TestArm):
         # TODO how is a negative number encoded?
         self.fail("Not sure how to encode negative numbers")
 
+    @unittest.expectedFailure
     def test_rule_special_register(self):
         # http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0588b/Cihibbbh.html
         # TODO This list does not contain the PSR, but is it a valid code to read from?
@@ -292,13 +293,12 @@ class TestArmArithmetic(TestArm):
 
     def test_ADCS(self):
         self.interp.register['R0'] = 1
-        self.interp.register['R1'] = 2
         self.interp.register['R2'] = 3
 
         self.interp.evaluate(" ADCS R0, R0, R2")
         self.interp.run()
 
-        self.assertEqual(self.interp.register['R0'], 5)
+        self.assertEqual(self.interp.register['R0'], 4)
         # TODO check for status registers
         # TODO check for carry bit
 
