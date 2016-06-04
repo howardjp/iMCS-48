@@ -9,7 +9,7 @@ class _Meta(iarm.cpu.RegisterCpu):
     Give helper functions to the instructions
     """
     REGISTER_REGEX = r'R(\d+)'
-    IMMEDIATE_REGEX = r'#(0[xX][0-9a-fA-F]+|2_[01]+|\d+)'
+    IMMEDIATE_REGEX = r'#(0[xX][0-9a-zA-Z]+|2_\d+|\d+)'
     ONE_PARAMETER = r'\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
     TWO_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
     THREE_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'

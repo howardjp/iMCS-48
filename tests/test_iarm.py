@@ -86,8 +86,13 @@ class TestArmChecks(TestArm):
         self.assertEqual(self.interp.check_immediate('#15'), 15)
         self.assertEqual(self.interp.check_immediate('#0x5'), 5)
         self.assertEqual(self.interp.check_immediate('#0x70'), 112)
+        self.assertEqual(self.interp.check_immediate('#2_0011'), 3)
         with self.assertRaises(iarm.exceptions.RuleError):
-            self.interp.check_register('#')
+            self.interp.check_immediate('#')
+        with self.assertRaises(ValueError):
+            self.interp.check_immediate('#0xFG')
+        with self.assertRaises(ValueError):
+            self.interp.check_immediate('#2_012')
 
     @unittest.skip("How to best test this")
     def test_check_immediate_unsiged_value(self):
