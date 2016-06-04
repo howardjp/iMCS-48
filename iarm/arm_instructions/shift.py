@@ -9,8 +9,7 @@ class Shift(_Meta):
         if self.is_register(Rc):
             # ASRS Ra, Ra, Rb
             self.check_arguments(low_registers=(Ra, Rc))
-            if Ra != Rb:
-                raise iarm.exceptions.RuleError("First parameter {} does not match second parameter {}".format(Ra, Rb))
+            self.match_first_two_parameters(Ra, Rb)
 
             def ASRS_func():
                 # Set the C flag, or the last shifted out bit
@@ -52,8 +51,7 @@ class Shift(_Meta):
         if self.is_register(Rc):
             # LSLS Ra, Ra, Rb
             self.check_arguments(low_registers=(Ra, Rc))
-            if Ra != Rb:
-                raise iarm.exceptions.RuleError("First parameter {} does not match second parameter {}".format(Ra, Rb))
+            self.match_first_two_parameters(Ra, Rb)
 
             def LSLS_func():
                 # Set the C flag, or the last shifted out bit
@@ -87,8 +85,7 @@ class Shift(_Meta):
         if self.is_register(Rc):
             # LSRS Ra, Ra, Rb
             self.check_arguments(low_registers=(Ra, Rc))
-            if Ra != Rb:
-                raise iarm.exceptions.RuleError("First parameter {} does not match second parameter {}".format(Ra, Rb))
+            self.match_first_two_parameters(Ra, Rb)
 
             def LSRS_func():
                 # Set the C flag, or the last shifted out bit
@@ -126,8 +123,7 @@ class Shift(_Meta):
 
         # RORS Ra, Ra, Rb
         self.check_arguments(low_registers=(Ra, Rc))
-        if Ra != Rb:
-            raise iarm.exceptions.RuleError("First parameter {} does not match second parameter {}".format(Ra, Rb))
+        self.match_first_two_parameters(Ra, Rb)
 
         def RORS_func():
             raise NotImplementedError

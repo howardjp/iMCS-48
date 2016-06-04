@@ -7,8 +7,7 @@ class Arithmetic(_Meta):
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rc))
-        if Ra != Rb:
-            raise iarm.exceptions.RuleError("First parameter {} does not equal second parameter {}".format(Ra, Rb))
+        self.match_first_two_parameters(Ra, Rb)
 
         # ADCS Ra, Ra, Rb
         def ADCS_func():
@@ -64,8 +63,7 @@ class Arithmetic(_Meta):
         elif Ra == Rb:
             # ADDS Ra, Ra, #imm8
             self.check_arguments(low_registers=(Ra,), imm8=(Rc,))
-            if Ra != Rb:
-                raise iarm.exceptions.RuleError("First parameter {} does not equal second parameter {}".format(Ra, Rb))
+            self.match_first_two_parameters(Ra, Rb)
 
             def ADDS_func():
                 oper_1 = self.register[Ra]
@@ -155,8 +153,7 @@ class Arithmetic(_Meta):
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb, Rc))
-        if Ra != Rb:
-            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
+        self.match_first_two_parameters(Ra, Rb)
 
         # SBCS Ra, Ra, Rb
         def SBCS_func():

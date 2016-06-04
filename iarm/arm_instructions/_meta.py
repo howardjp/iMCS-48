@@ -404,3 +404,7 @@ class _Meta(iarm.cpu.RegisterCpu):
     def rule_label_exists(self, arg):
         if arg not in self.labels:
             warnings.warn("Label {} does not exist yet".format(arg), iarm.exceptions.LabelDoesNotExist)
+
+    def match_first_two_parameters(self, Ra, Rb):
+        if Ra != Rb:
+            raise iarm.exceptions.RuleError("First parameter {} does not match second parameter {}".format(Ra, Rb))

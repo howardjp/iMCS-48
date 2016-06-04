@@ -7,8 +7,7 @@ class Logic(_Meta):
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rc))
-        if Ra != Rb:
-            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
+        self.match_first_two_parameters(Ra, Rb)
 
         # ANDS Ra, Ra, Rb
         def ANDS_func():
@@ -21,8 +20,7 @@ class Logic(_Meta):
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rc))
-        if Ra != Rb:
-            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
+        self.match_first_two_parameters(Ra, Rb)
 
         # BICS Ra, Ra, Rb
         def BICS_func():
@@ -35,8 +33,7 @@ class Logic(_Meta):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
         self.check_arguments(low_registers=(Ra, Rc))
-        if Ra != Rb:
-            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
+        self.match_first_two_parameters(Ra, Rb)
 
         # EORS Ra, Ra, Rb
         def EORS_func():
@@ -49,8 +46,7 @@ class Logic(_Meta):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
         self.check_arguments(low_registers=(Ra, Rc))
-        if Ra != Rb:
-            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
+        self.match_first_two_parameters(Ra, Rb)
 
         # ORRS Ra, Ra, Rb
         def ORRS_func():
