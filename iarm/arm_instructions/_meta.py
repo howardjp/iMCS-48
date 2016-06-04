@@ -1,6 +1,7 @@
 import re
 import iarm.exceptions
 import iarm.cpu
+import warnings
 
 
 class _Meta(iarm.cpu.RegisterCpu):
@@ -9,6 +10,7 @@ class _Meta(iarm.cpu.RegisterCpu):
     """
     REGISTER_REGEX = r'R(0[xX][0-9a-fA-F]+|\d+)'
     IMMEDIATE_REGEX = r'#(0[xX][0-9a-fA-F]+|\d+)'
+    ONE_PARAMETER = r'\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
     TWO_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
     THREE_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
 
@@ -227,6 +229,21 @@ class _Meta(iarm.cpu.RegisterCpu):
             raise iarm.exceptions.ParsingError("Parameters are None, did you miss a comma?")
         return match
 
+    def get_one_parameter(self, regex_exp, parameters):
+        """
+        Get three parameters from a given regex expression
+
+        Raise an exception if more than three were found
+        :param regex_exp:
+        :param parameters:
+        :return:
+        """
+        match = self.get_parameters(regex_exp, parameters)
+        Rx, other = match.groups()
+        if other:
+            raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
+        return Rx
+
     def get_two_parameters(self, regex_exp, parameters):
         """
         Get two parameters from a given regex expression
@@ -381,3 +398,7 @@ class _Meta(iarm.cpu.RegisterCpu):
 
     def is_V_set(self):
         return True if (self.register['APSR'] & (1 << 28)) else False
+
+    def rule_label_exists(self, arg):
+        if arg not in self.labels:
+            warnings.warn("Label {} does not exist yet".format(arg), iarm.exceptions.LabelDoesNotExist)

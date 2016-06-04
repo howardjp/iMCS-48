@@ -459,6 +459,24 @@ class TestArmLogic(TestArm):
         pass
 
 
+class TestArmUnconditionalBranch(TestArm):
+    @unittest.skip('No Test Defined')
+    def test_B(self):
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_BL(self):
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_BLX(self):
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_BX(self):
+        pass
+
+
 class TestArmRegisters(TestArm):
     """
     Make sure that PC, LR, and SP are linked to R15, R14, and R13 respectively
