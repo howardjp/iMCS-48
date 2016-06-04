@@ -27,6 +27,8 @@ class _Meta(iarm.cpu.RegisterCpu):
         :param code: The code to parse
         :return: A list of tuples in the form of (label, instruction, parameters)
         """
+        remove_comments = re.compile(r'^([^;\n]*);?.*$', re.MULTILINE)
+        code = '\n'.join(remove_comments.findall(code))  # TODO can probably do this better
         parser = re.compile(r'^(\w*)?[ \t\r\f\v]*(\w*)[ \t\r\f\v]*(.*)$', re.MULTILINE)
         return parser.findall(code)
 
