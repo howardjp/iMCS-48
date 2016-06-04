@@ -27,7 +27,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         :param code: The code to parse
         :return: A list of tuples in the form of (label, instruction, parameters)
         """
-        parser = re.compile(r'^(\w*)?\s*(\w*)\s*(.*)$', re.MULTILINE)
+        parser = re.compile(r'^(\w*)?[ \t\r\f\v]*(\w*)[ \t\r\f\v]*(.*)$', re.MULTILINE)
         return parser.findall(code)
 
     def is_register(self, R):
