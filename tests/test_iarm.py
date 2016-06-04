@@ -75,10 +75,10 @@ class TestArmChecks(TestArm):
         self.assertEqual(self.interp.check_register('R0'), 0)
         self.assertEqual(self.interp.check_register('R1'), 1)
         self.assertEqual(self.interp.check_register('R15'), 15)
-        self.assertEqual(self.interp.check_register('R0x5'), 5)
-        self.assertEqual(self.interp.check_register('R0xE'), 14)
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_register('R')
+            self.interp.check_register('R0x5')
+            self.interp.check_register('R0xE')
 
     def test_check_immediate(self):
         self.assertEqual(self.interp.check_immediate('#0'), 0)

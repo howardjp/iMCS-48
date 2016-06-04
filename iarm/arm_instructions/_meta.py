@@ -8,7 +8,7 @@ class _Meta(iarm.cpu.RegisterCpu):
     """
     Give helper functions to the instructions
     """
-    REGISTER_REGEX = r'R(0[xX][0-9a-fA-F]+|\d+)'
+    REGISTER_REGEX = r'R(\d+)'
     IMMEDIATE_REGEX = r'#(0[xX][0-9a-fA-F]+|\d+)'
     ONE_PARAMETER = r'\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
     TWO_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
@@ -105,10 +105,12 @@ class _Meta(iarm.cpu.RegisterCpu):
         match = re.search(self.IMMEDIATE_REGEX, arg)
         if match is None:
             raise iarm.exceptions.RuleError("Parameter {} is not an immediate".format(arg))
-        try:
-            return int(match.groups()[0])
-        except ValueError:
+        if match.groups()[0].startswith('0x'):
             return int(match.groups()[0], 16)
+        elif match.groups()[0].startswith('2_'):
+            return int(match.groups()[0][2:], 2)
+        else:
+            return int(match.groups()[0])
 
     def check_immediate_unsigned_value(self, arg, bit):
         """
