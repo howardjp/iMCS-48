@@ -343,7 +343,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         # Set the V flag
         if _type == 'add':
             pass
-        if _type == 'sub':
+        elif _type == 'sub':
             oper_2 = (~oper_2 & (2**self._bit_width - 1)) + 1
         else:
             raise iarm.exceptions.BrainFart("_type is not 'add' or 'sub'")
@@ -370,5 +370,14 @@ class _Meta(iarm.cpu.RegisterCpu):
         if arg not in ('LR', 'R14', 'SP', 'R13'):
             self.check_arguments(general_purpose_registers=(arg,))
 
-    def is_carry_set(self):
+    def is_N_set(self):
+        return True if (self.register['APSR'] & (1 << 31)) else False
+
+    def is_Z_set(self):
+        return True if (self.register['APSR'] & (1 << 30)) else False
+
+    def is_C_set(self):
         return True if (self.register['APSR'] & (1 << 29)) else False
+
+    def is_V_set(self):
+        return True if (self.register['APSR'] & (1 << 28)) else False

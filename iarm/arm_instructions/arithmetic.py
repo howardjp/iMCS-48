@@ -10,7 +10,7 @@ class Arithmetic(_Meta):
 
         def ADCS_func():
             self.register[Ra] = self.register[Rb] + self.register[Rc]
-            self.register[Ra] += 1 if (self.register['APSR'] & (1 << 29)) else 0
+            self.register[Ra] += 1 if self.is_C_set() else 0
             self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'add')
 
         return ADCS_func
@@ -82,7 +82,7 @@ class Arithmetic(_Meta):
         return CMN_func
 
     def CMP(self, params):
-        Rm, Rn = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Rm, Rn = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rn):
             self.check_arguments(R0_thru_R14=(Rm, Rn))
@@ -100,7 +100,7 @@ class Arithmetic(_Meta):
         return CMP_func
 
     def MULS(self, params):
-        Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb, Rc))
         if Ra != Rc:
@@ -119,7 +119,7 @@ class Arithmetic(_Meta):
         return NOP_func
 
     def RSBS(self, params):
-        Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb))
         if Rc != '#0':
@@ -132,7 +132,7 @@ class Arithmetic(_Meta):
         return RSBS_func
 
     def SBCS(self, params):
-        Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb, Rc))
         if Ra != Rb:
@@ -141,14 +141,14 @@ class Arithmetic(_Meta):
         def SBCS_func():
             # TODO does setting the flags work here?
             oper_1 = self.register[Rb]
-            oper_2 = self.register[Rc] + (1 if self.is_carry_set() else 0)
+            oper_2 = self.register[Rc] + (1 if self.is_C_set() else 0)
             self.register[Ra] = self.register[Rb] - oper_2
             self.set_NZCV_flags(oper_1, oper_2, self.register[Ra], 'sub')
 
         return SBCS_func
 
     def SUB(self, params):
-        Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(imm9_4=(Rc,))
         if Ra != 'SP':
@@ -162,7 +162,7 @@ class Arithmetic(_Meta):
         return SUB_func
 
     def SUBS(self, params):
-        Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rc):
             self.check_arguments(low_registers=(Ra, Rb, Rc))

@@ -391,7 +391,7 @@ class TestArmArithmetic(TestArm):
         self.interp.evaluate(" CMP R0, R1")
         self.interp.run()
 
-        self.assertEqual(self.interp.register['APSR'], 1 << 30)
+        self.assertTrue(self.interp.is_Z_set())
         # TODO test other cases
 
     def test_MULS(self):
@@ -425,6 +425,33 @@ class TestArmArithmetic(TestArm):
 
     @unittest.skip('No Test Defined')
     def test_SUBS(self):
+        # TODO write a test
+        pass
+
+
+class TestArmLogic(TestArm):
+    @unittest.skip('No Test Defined')
+    def test_ANDS(self):
+        # TODO write a test
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_BICS(self):
+        # TODO write a test
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_EORS(self):
+        # TODO write a test
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_ORRS(self):
+        # TODO write a test
+        pass
+
+    @unittest.skip('No Test Defined')
+    def test_TST(self):
         # TODO write a test
         pass
 
@@ -489,62 +516,87 @@ class TestArmRegisters(TestArm):
     def test_set_N_flag(self):
         self.interp.set_N_flag(-1 & (2**self.interp._bit_width - 1))
         self.assertEqual(self.interp.register['APSR'], (1 << 31))
+        self.assertTrue(self.interp.is_N_set())
         self.interp.set_N_flag(0)
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_N_set())
         self.interp.set_N_flag(1)
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_N_set())
         self.interp.set_N_flag(2**self.interp._bit_width - 1)
         self.assertEqual(self.interp.register['APSR'], 1 << 31)
+        self.assertTrue(self.interp.is_N_set())
         self.interp.set_N_flag(2 ** (self.interp._bit_width - 2))
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_N_set())
         self.interp.set_N_flag(-2**(self.interp._bit_width - 2) & (2**self.interp._bit_width - 1))
         self.assertEqual(self.interp.register['APSR'], (1 << 31))
+        self.assertTrue(self.interp.is_N_set())
 
     def test_set_Z_flag(self):
         self.interp.set_Z_flag(-1 & (2**self.interp._bit_width - 1))
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_Z_set())
         self.interp.set_Z_flag(0)
         self.assertEqual(self.interp.register['APSR'], (1 << 30))
+        self.assertTrue(self.interp.is_Z_set())
         self.interp.set_Z_flag(1)
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_Z_set())
         self.interp.set_Z_flag(2**self.interp._bit_width - 1)
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_Z_set())
         self.interp.set_Z_flag((2**self.interp._bit_width - 1) & (2**self.interp._bit_width - 1))
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_Z_set())
 
     def test_set_C_flag(self):
         self.interp.set_C_flag(1, 2**self.interp._bit_width - 1, 0, 'add')
         self.assertEqual(self.interp.register['APSR'], (1 << 29))
+        self.assertTrue(self.interp.is_C_set())
         self.interp.set_C_flag(1, 1, 2, 'add')
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_C_set())
         self.interp.set_C_flag(2 ** self.interp._bit_width - 2, 3, 1, 'add')
         self.assertEqual(self.interp.register['APSR'], (1 << 29))
+        self.assertTrue(self.interp.is_C_set())
         self.interp.set_C_flag(0, 0, 0, 'add')
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_C_set())
 
         self.interp.set_C_flag(0, 1, 2**self.interp._bit_width - 1, 'sub')
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_C_set())
         self.interp.set_C_flag(2, 1, 1, 'sub')
         self.assertEqual(self.interp.register['APSR'], 1 << 29)
+        self.assertTrue(self.interp.is_C_set())
         self.interp.set_C_flag(1, 18, -17 & (2**self.interp._bit_width - 1), 'sub')
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_C_set())
         self.interp.set_C_flag(1, 1, 0, 'sub')
         self.assertEqual(self.interp.register['APSR'], 1 << 29)
+        self.assertTrue(self.interp.is_C_set())
         self.interp.set_C_flag(0, 0, 0, 'sub')
         self.assertEqual(self.interp.register['APSR'], 1 << 29)
+        self.assertTrue(self.interp.is_C_set())
 
     def test_set_V_flag(self):
         self.interp.set_V_flag(1, 1, 2, 'add')
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_V_set())
         self.interp.set_V_flag(0x40000000, 0x40000000, 0x80000000, 'add')
         self.assertEqual(self.interp.register['APSR'], 1 << 28)
+        self.assertTrue(self.interp.is_V_set())
         self.interp.set_V_flag(0xFFFFFFFF, 0x80000000, 0x7FFFFFFF, 'add')
         self.assertEqual(self.interp.register['APSR'], 1 << 28)
+        self.assertTrue(self.interp.is_V_set())
 
         self.interp.set_V_flag(1, 1, 0, 'sub')
         self.assertEqual(self.interp.register['APSR'], 0)
+        self.assertFalse(self.interp.is_V_set())
         self.interp.set_V_flag(0x7FFFFFFF, 0xFFFFFFFF, 0x80000000, 'sub')
         self.assertEqual(self.interp.register['APSR'], 1 << 28)
+        self.assertTrue(self.interp.is_V_set())
 
     def test_set_NZCV_flags(self):
         # Table taken from
