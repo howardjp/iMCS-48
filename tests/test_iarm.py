@@ -295,12 +295,15 @@ class TestArmArithmetic(TestArm):
         self.interp.register['R1'] = 2
         self.interp.register['R2'] = 3
 
-        self.interp.evaluate(" ADCS R0, R1, R2")
+        self.interp.evaluate(" ADCS R0, R0, R2")
         self.interp.run()
 
         self.assertEqual(self.interp.register['R0'], 5)
         # TODO check for status registers
         # TODO check for carry bit
+
+        with self.assertRaises(iarm.exceptions.RuleError):
+            self.interp.evaluate(" ADCS R0, R1, R2")
 
     def test_ADD(self):
         self.interp.register['R0'] = 1

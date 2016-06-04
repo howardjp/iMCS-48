@@ -6,12 +6,18 @@ class Arithmetic(_Meta):
     def ADCS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
-        self.check_arguments(low_registers=(Ra, Rb, Rc))
+        self.check_arguments(low_registers=(Ra, Rc))
+        if Ra != Rb:
+            raise iarm.exceptions.RuleError("First parameter {} does not equal second parameter {}".format(Ra, Rb))
 
+        # ADCS Ra, Ra, Rb
         def ADCS_func():
-            self.register[Ra] = self.register[Rb] + self.register[Rc]
+            # TODO need to rethink the set_NZCV with the C flag
+            oper_1 = self.register[Ra]
+            oper_2 = self.register[Rc]
+            self.register[Ra] = oper_1 + oper_2
             self.register[Ra] += 1 if self.is_C_set() else 0
-            self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'add')
+            self.set_NZCV_flags(oper_1, oper_2, self.register[Ra], 'add')
 
         return ADCS_func
 
@@ -51,22 +57,30 @@ class Arithmetic(_Meta):
             self.check_arguments(low_registers=(Ra, Rb, Rc))
 
             def ADDS_func():
+                oper_1 = self.register[Rb]
+                oper_2 = self.register[Rc]
                 self.register[Ra] = self.register[Rb] + self.register[Rc]
-                self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'add')
+                self.set_NZCV_flags(oper_1, oper_2, self.register[Ra], 'add')
         elif Ra == Rb:
             # ADDS Ra, Ra, #imm8
             self.check_arguments(low_registers=(Ra,), imm8=(Rc,))
+            if Ra != Rb:
+                raise iarm.exceptions.RuleError("First parameter {} does not equal second parameter {}".format(Ra, Rb))
 
             def ADDS_func():
-                self.register[Ra] = self.register[Rb] + int(Rc[1:])
-                self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'add')
+                oper_1 = self.register[Ra]
+                oper_2 = int(Rc[1:])
+                self.register[Ra] = self.register[Ra] + int(Rc[1:])
+                self.set_NZCV_flags(oper_1, oper_2, self.register[Ra], 'add')
         else:
             # ADDS Ra, Rb, #imm3
             self.check_arguments(low_registers=(Ra, Rb), imm3=(Rc,))
 
             def ADDS_func():
+                oper_1 = self.register[Rb]
+                oper_2 = int(Rc[1:])
                 self.register[Ra] = self.register[Rb] + int(Rc[1:])
-                self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'add')
+                self.set_NZCV_flags(oper_1, oper_2, self.register[Ra], 'add')
 
         return ADDS_func
 
@@ -75,6 +89,7 @@ class Arithmetic(_Meta):
 
         self.check_arguments(low_registers=(Ra, Rb))
 
+        # CMN Ra, Rb
         def CMN_func():
             self.set_NZCV_flags(self.register[Ra], self.register[Rb],
                                 self.register[Ra] + self.register[Rb], 'add')
@@ -85,12 +100,14 @@ class Arithmetic(_Meta):
         Rm, Rn = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rn):
+            # CMP Rm, Rn
             self.check_arguments(R0_thru_R14=(Rm, Rn))
 
             def CMP_func():
                 self.set_NZCV_flags(self.register[Rm], self.register[Rn],
                                     self.register[Rm] - self.register[Rn], 'sub')
         else:
+            # CMP Rm, #imm8
             self.check_arguments(R0_thru_R14=(Rm,), imm8=(Rn,))
 
             def CMP_func():
@@ -106,6 +123,7 @@ class Arithmetic(_Meta):
         if Ra != Rc:
             raise iarm.exceptions.RuleError("Third parameter {} is not the same as the first parameter {}".format(Rc, Ra))
 
+        # MULS Ra, Rb, Ra
         def MULS_func():
             self.register[Ra] = self.register[Rb] * self.register[Rc]
             self.set_NZ_flags(self.register[Ra])
@@ -124,10 +142,12 @@ class Arithmetic(_Meta):
         self.check_arguments(low_registers=(Ra, Rb))
         if Rc != '#0':
             raise iarm.exceptions.RuleError("Third parameter {} is not #0".format(Rc))
+        # RSBS Ra, Rb, #0
 
         def RSBS_func():
+            oper_2 = self.register[Rb]
             self.register[Ra] = 0 - self.register[Rb]
-            self.set_NZCV_flags(0, self.register[Rb], self.register[Ra], 'sub')
+            self.set_NZCV_flags(0, oper_2, self.register[Ra], 'sub')
 
         return RSBS_func
 
@@ -138,6 +158,7 @@ class Arithmetic(_Meta):
         if Ra != Rb:
             raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
 
+        # SBCS Ra, Ra, Rb
         def SBCS_func():
             # TODO does setting the flags work here?
             oper_1 = self.register[Rb]
@@ -156,6 +177,7 @@ class Arithmetic(_Meta):
         if Rb != 'SP':
             raise iarm.exceptions.RuleError("Second parameter {} is not equal to SP".format(Rb))
 
+        # SUB SP, SP, #imm9_4
         def SUB_func():
             self.register[Ra] = self.register[Rb] - self.register[Rc]
 
@@ -165,13 +187,17 @@ class Arithmetic(_Meta):
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rc):
+            # SUBS Ra, Rb, Rc
             self.check_arguments(low_registers=(Ra, Rb, Rc))
 
             def SUBS_func():
+                oper_1 = self.register[Rb]
+                oper_2 = self.register[Rc]
                 self.register[Ra] = self.register[Rb] - self.register[Rc]
-                self.set_NZCV_flags(self.register[Rb], self.register[Rc], self.register[Ra], 'sub')
+                self.set_NZCV_flags(oper_1, oper_2, self.register[Ra], 'sub')
         else:
             if Ra == Rb:
+                # SUBS Ra, Ra, #imm8
                 self.check_arguments(low_registers=(Ra,), imm8=(Rc,))
 
                 def SUBS_func():
@@ -179,6 +205,7 @@ class Arithmetic(_Meta):
                     self.register[Ra] = self.register[Ra] - int(Rc[1:])
                     self.set_NZCV_flags(oper_1, int(Rc[1:]), self.register[Ra], 'sub')
             else:
+                # SUBS Ra, Rb, #imm3
                 self.check_arguments(low_registers=(Ra, Rb), imm3=(Rc,))
 
                 def SUBS_func():
