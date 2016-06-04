@@ -1,53 +1,71 @@
 import iarm.exceptions
 from ._meta import _Meta
 
+
 class Logic(_Meta):
     def ANDS(self, params):
-        Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rc))
+        if Ra != Rb:
+            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
 
-        def UXTH_func():
-            raise NotImplementedError
+        # ANDS Ra, Ra, Rb
+        def ANDS_func():
+            self.register[Ra] = self.register[Ra] & self.register[Rc]
+            self.set_NZ_flags(self.register[Ra])
 
-        return UXTH_func
+        return ANDS_func
 
     def BICS(self, params):
-        Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rc))
+        if Ra != Rb:
+            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
 
-        def UXTH_func():
-            raise NotImplementedError
+        # BICS Ra, Ra, Rb
+        def BICS_func():
+            self.register[Ra] = self.register[Ra] & (~self.register[Rc])
+            self.set_NZ_flags(self.register[Ra])
 
-        return UXTH_func
+        return BICS_func
 
     def EORS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rc))
+        if Ra != Rb:
+            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
 
-        def UXTH_func():
-            raise NotImplementedError
+        # EORS Ra, Ra, Rb
+        def EORS_func():
+            self.register[Ra] = self.register[Ra] ^ self.register[Rc]
+            self.set_NZ_flags(self.register[Ra])
 
-        return UXTH_func
+        return EORS_func
 
     def ORRS(self, params):
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rc))
+        if Ra != Rb:
+            raise iarm.exceptions.RuleError("First parametere {} does not match second parameter {}".format(Ra, Rb))
 
-        def UXTH_func():
-            raise NotImplementedError
+        # ORRS Ra, Ra, Rb
+        def ORRS_func():
+            self.register[Ra] = self.register[Ra] | self.register[Rc]
+            self.set_NZ_flags(self.register[Ra])
 
-        return UXTH_func
+        return ORRS_func
 
     def TST(self, params):
-        Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        Ra, Rb = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
-        raise iarm.exceptions.NotImplementedError
+        self.check_arguments(low_registers=(Ra, Rb))
 
-        def UXTH_func():
-            raise NotImplementedError
+        def TST_func():
+            result = self.register[Ra] & self.register[Rb]
+            self.set_NZ_flags(result)
 
-        return UXTH_func
+        return TST_func
