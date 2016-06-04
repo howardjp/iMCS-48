@@ -185,6 +185,7 @@ class TestArmRules(TestArm):
             self.interp.check_arguments(imm3=('#8',))
 
     def test_rule_imm5(self):
+        # [0, 31]
         self.interp.check_arguments(imm5=('#0', '#1', '#31', '#0xF'))
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(imm5=('R0',))
@@ -192,11 +193,12 @@ class TestArmRules(TestArm):
             self.interp.check_arguments(imm5=('#32',))
 
     def test_rule_imm5_counting(self):
-        self.interp.check_arguments(imm5_counting=('#1', '#31', '#0xE'))
+        # [1, 32]
+        self.interp.check_arguments(imm5_counting=('#1', '#32', '#0xE'))
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(imm5_counting=('R0',))
         with self.assertRaises(iarm.exceptions.RuleError):
-            self.interp.check_arguments(imm5_counting=('#32',))
+            self.interp.check_arguments(imm5_counting=('#33',))
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.check_arguments(imm5_counting=('#0',))
 

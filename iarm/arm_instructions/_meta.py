@@ -188,7 +188,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         self.check_immediate_unsigned_value(arg, 5)
 
     def rule_imm5_counting(self, arg):
-        self.check_immediate_value(arg, 2 ** 5 - 1, 1)
+        self.check_immediate_value(arg, 2 ** 5, 1)
 
     def rule_imm6_2(self, arg):
         i_num = self.check_immediate_unsigned_value(arg, 6)
