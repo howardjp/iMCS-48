@@ -1,3 +1,4 @@
+import iarm.exceptions
 from ._meta import _Meta
 
 
@@ -10,6 +11,8 @@ class UnconditionalBranch(_Meta):
 
         # B label
         def B_func():
+            if label == '.':
+                raise iarm.exceptions.EndOfProgram("You have reached an infinite loop")
             self.register['PC'] = self.labels[label]
 
         return B_func

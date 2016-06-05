@@ -35,3 +35,9 @@ class LabelDoesNotExist(IarmWarning):
     Used when a label does not currently exist (but may in the future during execution)
     """
     pass
+
+
+class EndOfProgram(IarmError):
+    """
+    When we have reached the end of the program or a known infinite loop
+    """

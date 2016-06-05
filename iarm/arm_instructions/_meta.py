@@ -404,7 +404,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         return True if (self.register['APSR'] & (1 << 28)) else False
 
     def rule_label_exists(self, arg):
-        if arg not in self.labels:
+        if (arg not in self.labels) or (arg != '.'):
             warnings.warn("Label {} does not exist yet".format(arg), iarm.exceptions.LabelDoesNotExist)
 
     def match_first_two_parameters(self, Ra, Rb):

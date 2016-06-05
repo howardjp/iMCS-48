@@ -35,7 +35,10 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
             # Set the label to the next instruction
             if label:
                 if label == 'END':
-                    break
+                    raise iarm.exceptions.EndOfProgram("Yoy have reached the end of the program")
+                if op == 'EQU':
+                    # TODO figure out how to do equates
+                    self.equates[label] = params
                 labels[label] = len(self.program) + len(program)
 
             # If the op lookup fails, it was a bad instruction
