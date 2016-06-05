@@ -34,6 +34,8 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
             # Set the label to the next instruction
             if label:
+                if label == 'END':
+                    break
                 labels[label] = len(self.program) + len(program)
 
             # If the op lookup fails, it was a bad instruction
