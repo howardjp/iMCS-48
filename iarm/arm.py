@@ -38,6 +38,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                     raise iarm.exceptions.EndOfProgram("You have reached the end of the program")
                 if op == 'EQU':
                     # TODO figure out how to do equates
+                    # TODO can equates work on other things besides parameters (like instructions?)
                     self.equates[label] = params
                     continue
                 labels[label] = len(self.program) + len(program)
