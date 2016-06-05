@@ -231,7 +231,16 @@ class _Meta(iarm.cpu.RegisterCpu):
         match = re.match(regex_exp, parameters)
         if not match:
             raise iarm.exceptions.ParsingError("Parameters are None, did you miss a comma?")
-        return match
+
+        # Do text replacement for equates
+        replaced_list = []
+        for item in match.groups():
+            if item in self.equates:
+                replaced_list.append(self.equates[item])
+            else:
+                replaced_list.append(item)
+
+        return replaced_list
 
     def get_one_parameter(self, regex_exp, parameters):
         """
@@ -242,8 +251,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         :param parameters:
         :return:
         """
-        match = self.get_parameters(regex_exp, parameters)
-        Rx, other = match.groups()
+        Rx, other = self.get_parameters(regex_exp, parameters)
         if other:
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         return Rx
@@ -257,8 +265,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         :param parameters:
         :return:
         """
-        match = self.get_parameters(regex_exp, parameters)
-        Rx, Ry, other = match.groups()
+        Rx, Ry, other = self.get_parameters(regex_exp, parameters)
         if other:
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         if Rx and Ry:
@@ -277,8 +284,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         :param parameters:
         :return:
         """
-        match = self.get_parameters(regex_exp, parameters)
-        Rx, Ry, Rz, other = match.groups()
+        Rx, Ry, Rz, other = self.get_parameters(regex_exp, parameters)
         if other:
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         return Rx, Ry, Rz
