@@ -77,10 +77,10 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
     def print_status_bits(self):
         print("N: {} Z: {} C: {} V: {}".format(
-            1 if self.register['APSR'] & (1 << 31) else 0,
-            1 if self.register['APSR'] & (1 << 30) else 0,
-            1 if self.register['APSR'] & (1 << 29) else 0,
-            1 if self.register['APSR'] & (1 << 28) else 0,
+            int(self.is_N_set()),
+            int(self.is_Z_set()),
+            int(self.is_C_set()),
+            int(self.is_V_set()),
         ))
 
 
