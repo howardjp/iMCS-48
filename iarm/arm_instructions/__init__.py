@@ -13,3 +13,4 @@ from .memory import Memory
 from .conditional_branch import ConditionalBranch
 from .unconditional_branch import UnconditionalBranch
 from .misc import Misc
+from .directives import Directives

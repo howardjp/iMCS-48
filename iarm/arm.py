@@ -7,7 +7,7 @@ import iarm.arm_instructions as instructions
 class Arm(instructions.DataMovement, instructions.Arithmetic,
           instructions.Logic, instructions.Shift, instructions.Memory,
           instructions.ConditionalBranch, instructions.UnconditionalBranch,
-          instructions.Misc):
+          instructions.Misc, instructions.Directives):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -15,7 +15,6 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
         self.register.link('LR', 'R14')
         self.register.link('SP', 'R13')
         self.register['PC'] = 0
-        self.equates = {}
 
     def evaluate(self, code):
         parsed = self.parse_lines(code)
@@ -34,15 +33,19 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
             # Set the label to the next instruction
             if label:
-                if label == 'END':
-                    raise iarm.exceptions.EndOfProgram("You have reached the end of the program")
-                if op == 'EQU':
-                    # TODO figure out how to do equates
-                    # TODO can equates work on other things besides parameters (like instructions?)
-                    self.equates[label] = params
-                    continue
+                # TODO how to integrate directives and instructions
                 labels[label] = len(self.program) + len(program)
 
+            # First, see if op is a directive
+            # TODO raise an error if a directive is not where it should be
+            if op in self.directives:
+                try:
+                    self.directives[op](label, params)  # Directives are run immediately
+                    continue
+                except iarm.exceptions.IarmError:
+                    [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
+
+            # Next,
             # If the op lookup fails, it was a bad instruction
             try:
                 func = self.ops[op]

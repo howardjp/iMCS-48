@@ -41,3 +41,11 @@ class EndOfProgram(IarmError):
     """
     When we have reached the end of the program or a known infinite loop
     """
+
+
+class NotImplementedWarning(IarmWarning):
+    """
+    Used for instructions or directives that are not yet implemented,
+    but do not cause any significant change to the system or
+    are irrelevant in an interpreted environment
+    """
