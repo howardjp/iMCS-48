@@ -9,12 +9,27 @@ class Memory(_Meta):
         raise iarm.exceptions.NotImplementedError
 
     def LDM(self, params):
-        raise iarm.exceptions.NotImplementedError
+        # TODO what registers can be stored?
+        Ra, RLoList = self.get_two_parameters(r'\s*([^\s,]*)!,\s*{(.*)}(.*)', params).split(',')
+        RLoList = RLoList.split(',')
+        RLoList = [i.strip() for i in RLoList]
+
+        self.check_arguments(low_registers=[Ra] + RLoList)
+
+        def LDM_func():
+            for i in range(len(RLoList)):
+                for j in range(4):
+                    self.memory[self.register[Ra] + 4*i + j] = ((self.register[RLoList[i]] >> (8 * j)) & 0xFF)
+                    self.register[RLoList[i]] = self.memory[self.register[Ra] + (4 * i) + j]
+            self.register[Ra] += 4*len(RLoList)
+
+        return LDM_func
 
     def LDR(self, params):
         # TODO definition for PC is Ra <- M[PC + Imm10_4], Imm10_4 = PC - label, need to figure this one out
         # TODO implement LDR Ra, [PC, #Imm10_4]
         # TODO implement LDR Ra, label
+        # TODO There is also that wierd thing with the equal sign
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
 
         if self.is_immediate(Rc):
@@ -78,14 +93,38 @@ class Memory(_Meta):
         return LDRH_func
 
     def LDRSB(self, params):
-        raise iarm.exceptions.NotImplementedError
+        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
+
+        self.check_arguments(low_registers=(Ra, Rb, Rc))
+
+        def LDRSB_func():
+            # TODO does memory read up?
+            self.register[Ra] = 0
+            self.register[Ra] |= self.memory[self.register[Rb] + self.register[Rc]]
+            if self.register[Ra] & (1 << 7):
+                self.register[Ra] |= (0xFFFFFF << 8)
+
+        return LDRSB_func
 
     def LDRSH(self, params):
-        raise iarm.exceptions.NotImplementedError
+        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
+
+        self.check_arguments(low_registers=(Ra, Rb, Rc))
+
+        def LDRSH_func():
+            # TODO does memory read up?
+            self.register[Ra] = 0
+            for i in range(2):
+                self.register[Ra] |= (self.memory[self.register[Rb] + self.register[Rc] + i] << (8 * i))
+            if self.register[Ra] & (1 << 15):
+                self.register[Ra] |= (0xFFFF << 16)
+
+        return LDRSH_func
 
     def POP(self, params):
         # TODO verify pop order
         # TODO pop list is comma separate, right?
+        # TODO what registeres are allowed to POP to?
         RPopList = self.get_one_parameter(r'\s*{(.*)}(.*)*', params).split(',')
         RPopList.reverse()
         RPopList = [i.strip() for i in RPopList]
@@ -104,6 +143,7 @@ class Memory(_Meta):
         return POP_func
 
     def PUSH(self, params):
+        # TODO what registers are allowed to PUSH to?
         RPushList = self.get_one_parameter(r'\s*{(.*)}(.*)*', params).split(',')
         RPushList = [i.strip() for i in RPushList]
 
@@ -118,7 +158,20 @@ class Memory(_Meta):
         return PUSH_func
 
     def STM(self, params):
-        raise iarm.exceptions.NotImplementedError
+        # TODO what registers can be stored?
+        Ra, RLoList = self.get_two_parameters(r'\s*([^\s,]*)!,\s*{(.*)}(.*)', params).split(',')
+        RLoList = RLoList.split(',')
+        RLoList = [i.strip() for i in RLoList]
+
+        self.check_arguments(low_registers=[Ra] + RLoList)
+
+        def STM_func():
+            for i in range(len(RLoList)):
+                for j in range(4):
+                    self.memory[self.register[Ra] + 4*i + j] = ((self.register[RLoList[i]] >> (8 * j)) & 0xFF)
+            self.register[Ra] += 4*len(RLoList)
+
+        return STM_func
 
     def STR(self, params):
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
