@@ -125,7 +125,7 @@ class Memory(_Meta):
         # TODO verify pop order
         # TODO pop list is comma separate, right?
         # TODO what registeres are allowed to POP to?
-        RPopList = self.get_one_parameter(r'\s*{(.*)}(.*)*', params).split(',')
+        RPopList = self.get_one_parameter(r'\s*{(.*)}(.*)', params).split(',')
         RPopList.reverse()
         RPopList = [i.strip() for i in RPopList]
 
@@ -144,7 +144,7 @@ class Memory(_Meta):
 
     def PUSH(self, params):
         # TODO what registers are allowed to PUSH to?
-        RPushList = self.get_one_parameter(r'\s*{(.*)}(.*)*', params).split(',')
+        RPushList = self.get_one_parameter(r'\s*{(.*)}(.*)', params).split(',')
         RPushList = [i.strip() for i in RPushList]
 
         def PUSH_func():
