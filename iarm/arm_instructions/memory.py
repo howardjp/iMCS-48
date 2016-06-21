@@ -86,7 +86,7 @@ class Memory(_Meta):
     def POP(self, params):
         # TODO verify pop order
         # TODO pop list is comma separate, right?
-        RPopList = self.get_one_parameter(r'\s*{(.*)}', params).split(',')
+        RPopList = self.get_one_parameter(r'\s*{(.*)}(.*)*', params).split(',')
         RPopList.reverse()
         RPopList = [i.strip() for i in RPopList]
 

@@ -21,6 +21,7 @@ class RegisterCpu(object):
         :param postpone_execution: Should instructions be executed immediately or just store the program until a value is asked for (lazy execution)
         :return:
         """
+        super().__init__()
         self._bit_width = bit_width
         self._max_registers = max_registers - 1  # Code was made around this being zero indexed
         self._memory_width = memory_width
