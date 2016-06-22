@@ -176,7 +176,7 @@ class Arithmetic(_Meta):
 
         # SUB SP, SP, #imm9_4
         def SUB_func():
-            self.register[Ra] = self.register[Rb] - self.register[Rc]
+            self.register[Ra] = self.register[Rb] - int(Rc[1:])
 
         return SUB_func
 
