@@ -1,4 +1,4 @@
-from .test_iarm import TestArm
+from test_iarm import TestArm
 import iarm.exceptions
 import unittest
 
@@ -128,25 +128,80 @@ class TestArmArithmetic(TestArm):
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.evaluate(" MULS R0, R1, R2")
 
-    @unittest.skip("No Test Defined")
     def test_RSBS(self):
-        # TODO write some tests for this
-        pass
+        self.interp.register['R1'] = 10
 
-    @unittest.skip('No Test Defined')
+        self.interp.evaluate(" RSBS R0, R1, #0")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], -10 & 0xFFFFFFFF)
+        # TODO test flags
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            self.interp.evaluate(" RSBS, R3, R4, #1")
+
     def test_SBCS(self):
-        # TODO write a test
-        pass
+        self.interp.register['R0'] = 10
+        self.interp.register['R1'] = 3
 
-    @unittest.skip('No Test Defined')
+        self.interp.evaluate(" SBCS R0, R0, R1")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 7)
+
+        self.interp.set_APSR_flag_to_value('C', 1)
+
+        self.interp.evaluate(" SBCS R0, R0, R1")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 3)
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            self.interp.evaluate(" SBCS R0, R1, R2")
+
+        # TODO test flags
+
     def test_SUB(self):
-        # TODO wrte a test
-        pass
+        self.interp.register['SP'] = 8
 
-    @unittest.skip('No Test Defined')
+        self.interp.evaluate(" SUB SP, SP, #4")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['SP'], 4)
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            self.interp.evaluate(" SUB SP, R1, #4")
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            self.interp.evaluate(" SUB SP, SP, #3")
+
     def test_SUBS(self):
-        # TODO write a test
-        pass
+        self.interp.register['R4'] = 3
+        self.interp.register['R5'] = 2
+
+        self.interp.evaluate(" SUBS R3, R4, R5")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R3'], 1)
+
+        self.interp.evaluate(" SUBS R3, R3, #1")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R3'], 0)
+
+        self.interp.evaluate(" SUBS R3, R4, #5")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R3'], -2 & 0xFFFFFFFF)
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            self.interp.evaluate(" SUBS R3, R4, #8")
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            self.interp.evaluate(" SUBS R3, R3, #256")
+
+        # TODO check flags
+
 
 if __name__ == '__main_':
     unittest.main()
