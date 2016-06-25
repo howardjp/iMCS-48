@@ -6,6 +6,7 @@ class Memory(_Meta):
     THREE_PARAMETER_WITH_BRACKETS = r'\s*([^\s,]*),\s*\[([^\s,]*),\s*([^\s,]*)\](,\s*[^\s,]*)*\s*'
 
     def ADR(self, params):
+        # TODO may need to rethink how I do PC, may need to be byte alligned
         raise iarm.exceptions.NotImplementedError
 
     def LDM(self, params):
@@ -125,6 +126,7 @@ class Memory(_Meta):
         # TODO verify pop order
         # TODO pop list is comma separate, right?
         # TODO what registeres are allowed to POP to?
+        # TODO need to support ranges, ie {R2, R5-R7}
         RPopList = self.get_one_parameter(r'\s*{(.*)}(.*)', params).split(',')
         RPopList.reverse()
         RPopList = [i.strip() for i in RPopList]

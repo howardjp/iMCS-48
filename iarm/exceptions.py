@@ -49,3 +49,9 @@ class NotImplementedWarning(IarmWarning):
     but do not cause any significant change to the system or
     are irrelevant in an interpreted environment
     """
+
+
+class HardFault(IarmError):
+    """
+    Used for cases where the program has validated, is running, and an error or exception occurs
+    """
