@@ -50,12 +50,12 @@ class TestArmMemory(TestArm):
         self.interp.evaluate(" LDR R0, [R4, #4]")
         self.interp.run()
 
-        self.assertEqual(self.interp.register['R0'], 0x12345678)
+        self.assertEqual(self.interp.register['R0'], 0x78563412)
 
-        self.interp.evaluate(" LDR R1, [SP]")
+        self.interp.evaluate(" LDR R1, [SP, #0]")
         self.interp.run()
 
-        self.assertEqual(self.interp.register['R1'], 0x99000000)
+        self.assertEqual(self.interp.register['R1'], 0x00000099)
 
         self.interp.equates['TEST'] = 0x543210
         self.interp.evaluate(" LDR R2, =TEST")
@@ -63,9 +63,18 @@ class TestArmMemory(TestArm):
 
         self.assertEqual(self.interp.register['R2'], 0x543210)
 
+        self.interp.labels['TEST2'] = 0x1234
+        self.interp.evaluate(" LDR R2, =TEST2")
+        self.interp.run()
+
+        self.interp.evaluate(" LDR R2, [SP]")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R2'], 0x00000099)
+
         with self.assertRaises(iarm.exceptions.IarmError):
             # Register within 0-7
-            self.interp.evaluate(" LDR R8, [PC]")
+            self.interp.evaluate(" LDR R8, [R1]")
 
         with self.assertRaises(iarm.exceptions.IarmError):
             # data within 0-1020

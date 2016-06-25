@@ -28,10 +28,47 @@ class Memory(_Meta):
 
     def LDR(self, params):
         # TODO definition for PC is Ra <- M[PC + Imm10_4], Imm10_4 = PC - label, need to figure this one out
-        # TODO implement LDR Ra, [PC, #Imm10_4]
-        # TODO implement LDR Ra, label
-        # TODO There is also that wierd thing with the equal sign
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
+        except iarm.exceptions.ParsingError:
+            Ra, label = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+
+            if label.startswith('='):
+                # This is a pseudoinstructions
+                label = label[1:]
+                # TODO add check that label is a 32 bit number
+                self.check_arguments(low_registers=(Ra,))
+                if label in self.labels:
+                    label = self.labels[label]
+                else:
+                    label = self.equates[label]
+
+                if int(label) % 4 != 0:
+                    raise iarm.exceptions.IarmError("Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb], int(Rc[1:])))
+            elif label.startswith('[') and label.endswith(']'):
+                # TODO improve this
+                Rb = label[1:-1]
+                if Rb == 'SP' or Rb == 'R13':
+                    self.check_arguments(low_registers=(Ra,))
+                else:
+                    self.check_arguments(low_registers=(Ra, label))
+
+                def LDR_func():
+                    if self.memory[Rb] % 4 != 0:
+                        raise iarm.exceptions.HardFault(
+                            "Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb],
+                                                                                         int(Rc[1:])))
+                    self.register[Ra] = 0
+                    for i in range(4):
+                        self.register[Ra] |= (self.memory[self.register[Rb] + i] << (8 * i))
+                return LDR_func
+            else:
+                self.check_arguments(low_registers=(Ra,), imm10_4=(label,))
+
+            def LDR_func():
+                self.register[Ra] = int(label)
+
+            return LDR_func
 
         if self.is_immediate(Rc):
             if Rb == 'SP' or Rb == 'R15':
@@ -41,6 +78,8 @@ class Memory(_Meta):
 
             def LDR_func():
                 # TODO does memory read up?
+                if (self.register[Rb] + int(Rc[1:])) % 4 != 0:
+                    raise iarm.exceptions.HardFault("Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb], int(Rc[1:])))
                 self.register[Ra] = 0
                 for i in range(4):
                     self.register[Ra] |= (self.memory[self.register[Rb] + int(Rc[1:]) + i] << (8 * i))
@@ -49,6 +88,10 @@ class Memory(_Meta):
 
             def LDR_func():
                 # TODO does memory read up?
+                if (self.register[Rb] + self.register[Rc]) % 4 != 0:
+                    raise iarm.exceptions.HardFault(
+                        "Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb],
+                                                                                             int(Rc[1:])))
                 self.register[Ra] = 0
                 for i in range(4):
                     self.register[Ra] |= (self.memory[self.register[Rb] + self.register[Rc] + i] << (8 * i))
