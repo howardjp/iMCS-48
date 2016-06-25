@@ -237,7 +237,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         replaced_list = []
         for item in match.groups():
             if item in self.equates:
-                replaced_list.append(self.equates[item])
+                replaced_list.append(str(self.equates[item]))
             else:
                 replaced_list.append(item)
 
