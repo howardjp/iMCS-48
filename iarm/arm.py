@@ -57,6 +57,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
             try:
                 instruction = func(params)
             except iarm.exceptions.IarmError:
+                # TODO We may have a key error, or something other than an IarmError
                 [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
                 raise
 

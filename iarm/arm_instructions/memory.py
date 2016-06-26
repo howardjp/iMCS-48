@@ -40,8 +40,10 @@ class Memory(_Meta):
                 self.check_arguments(low_registers=(Ra,))
                 if label in self.labels:
                     label = self.labels[label]
-                else:
+                elif label in self.equates:
                     label = self.equates[label]
+                else:
+                    label = int(self.convert_to_integer(label))
 
                 if int(label) % 4 != 0:
                     raise iarm.exceptions.IarmError("Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb], int(Rc[1:])))
@@ -63,10 +65,25 @@ class Memory(_Meta):
                         self.register[Ra] |= (self.memory[self.register[Rb] + i] << (8 * i))
                 return LDR_func
             else:
-                self.check_arguments(low_registers=(Ra,), imm10_4=(label,))
+                self.check_arguments(low_registers=(Ra,), label_exists=(label,))
+                try:
+                    label_value = self.labels[label]
+                    if label_value >= 1024:
+                        raise iarm.exceptions.IarmError("Label {} has value {} and is greater than 1020".format(label, label_value))
+                    if label_value % 4 != 0:
+                        raise iarm.exceptions.IarmError("Lable {} has value {} and is not word aligned".format(label, label_value))
+                    label = label_value  # TODO All converted values should be label_value
+                except KeyError:
+                    # Label doesn't exist, nothing we can do about that except maybe raise an exception now,
+                    # But we're avoiding that elsewhere, might as well avoid it here too
+                    pass
 
             def LDR_func():
-                self.register[Ra] = int(label)
+                # TODO dont overload label, make a new variable
+                try:
+                    self.register[Ra] = int(label)
+                except ValueError:
+                    self.register[Ra] = self.labels[label]
 
             return LDR_func
 
