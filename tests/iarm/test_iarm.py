@@ -424,5 +424,5 @@ class TestArmRegisters(TestArm):
             self.interp.set_NZCV_flags(row[0], row[1], row[2], 'sub')
             self.assertEqual(self.interp.register['APSR'], row[3])
 
-if __name__ == '__main_':
+if __name__ == '__main__':
     unittest.main()

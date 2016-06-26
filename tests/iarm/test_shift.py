@@ -20,5 +20,5 @@ class TestArmShift(TestArm):
     def test_RORS(self):
         pass
 
-if __name__ == '__main_':
+if __name__ == '__main__':
     unittest.main()

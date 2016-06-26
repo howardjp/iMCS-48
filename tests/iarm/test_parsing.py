@@ -50,5 +50,5 @@ class TestArmValidation(TestArm):
         with self.assertRaises(iarm.exceptions.ValidationError):
             self.interp.evaluate(' BADINST')
 
-if __name__ == '__main_':
+if __name__ == '__main__':
     unittest.main()

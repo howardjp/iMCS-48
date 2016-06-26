@@ -203,5 +203,5 @@ class TestArmArithmetic(TestArm):
         # TODO check flags
 
 
-if __name__ == '__main_':
+if __name__ == '__main__':
     unittest.main()

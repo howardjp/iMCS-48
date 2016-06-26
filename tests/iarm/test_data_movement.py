@@ -224,5 +224,5 @@ class TestArmDataMovement(TestArm):
 
             self.assertEqual(self.interp.register['R0'], row[1])
 
-if __name__ == '__main_':
+if __name__ == '__main__':
     unittest.main()

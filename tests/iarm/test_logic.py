@@ -29,5 +29,5 @@ class TestArmLogic(TestArm):
         # TODO write a test
         pass
 
-if __name__ == '__main_':
+if __name__ == '__main__':
     unittest.main()
