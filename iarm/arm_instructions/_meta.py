@@ -106,12 +106,15 @@ class _Meta(iarm.cpu.RegisterCpu):
         match = re.search(self.IMMEDIATE_REGEX, arg)
         if match is None:
             raise iarm.exceptions.RuleError("Parameter {} is not an immediate".format(arg))
-        if match.groups()[0].startswith('0x'):
-            return int(match.groups()[0], 16)
-        elif match.groups()[0].startswith('2_'):
-            return int(match.groups()[0][2:], 2)
+        return self.convert_to_integer(match.groups()[0])
+
+    def convert_to_integer(self, str):
+        if str.startswith('0x'):
+            return int(str, 16)
+        elif str.startswith('2_'):
+            return int(str[2:], 2)
         else:
-            return int(match.groups()[0])
+            return int(str)
 
     def check_immediate_unsigned_value(self, arg, bit):
         """
