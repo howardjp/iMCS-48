@@ -116,7 +116,12 @@ class Memory(_Meta):
         return LDR_func
 
     def LDRB(self, params):
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
+        except iarm.exceptions.ParsingError:
+            # LDRB Rn, [Rk] translates to an offset of zero
+            Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*\[([^\s,]*)\](,\s*[^\s,]*)*\s*', params)
+            Rc = '#0'
 
         if self.is_immediate(Rc):
             self.check_arguments(low_registers=(Ra, Rb), imm5=(Rc,))
@@ -132,13 +137,22 @@ class Memory(_Meta):
         return LDRB_func
 
     def LDRH(self, params):
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
+        except iarm.exceptions.ParsingError:
+            # LDRB Rn, [Rk] translates to an offset of zero
+            Ra, Rb = self.get_two_parameters(r'\s*([^\s,]*),\s*\[([^\s,]*)\](,\s*[^\s,]*)*\s*', params)
+            Rc = '#0'
 
         if self.is_immediate(Rc):
             self.check_arguments(low_registers=(Ra, Rb), imm6_2=(Rc,))
 
             def LDRH_func():
                 # TODO does memory read up?
+                if (self.register[Rb]) % 2 != 0:
+                    raise iarm.exceptions.HardFault(
+                        "Memory access not half word aligned; Register: {}  Immediate: {}".format(self.register[Rb],
+                                                                                             int(Rc[1:])))
                 self.register[Ra] = 0
                 for i in range(2):
                     self.register[Ra] |= (self.memory[self.register[Rb] + int(Rc[1:]) + i] << (8 * i))
@@ -147,6 +161,10 @@ class Memory(_Meta):
 
             def LDRH_func():
                 # TODO does memory read up?
+                if (self.register[Rb] + self.register[Rc]) % 2 != 0:
+                    raise iarm.exceptions.HardFault(
+                        "Memory access not half word aligned; Register: {}  Immediate: {}".format(self.register[Rb],
+                                                                                             int(Rc[1:])))
                 self.register[Ra] = 0
                 for i in range(2):
                     self.register[Ra] |= (self.memory[self.register[Rb] + self.register[Rc] + i] << (8 * i))
@@ -154,6 +172,7 @@ class Memory(_Meta):
         return LDRH_func
 
     def LDRSB(self, params):
+        # TODO LDRSB cant use immediates
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
 
         self.check_arguments(low_registers=(Ra, Rb, Rc))
@@ -168,6 +187,7 @@ class Memory(_Meta):
         return LDRSB_func
 
     def LDRSH(self, params):
+        # TODO LDRSH cant use immediates
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
 
         self.check_arguments(low_registers=(Ra, Rb, Rc))
