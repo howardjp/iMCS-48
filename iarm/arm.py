@@ -70,12 +70,15 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
         if not self._postpone_execution:
             self.run()
 
-    def run(self):
+    def run(self, steps=float('inf')):
         """
-        Run to the current end of the program
+        Run to the current end of the program or a number of steps
         :return:
         """
         while len(self.program) > self.register['PC']:
+            steps -= 1
+            if steps < 0:
+                break
             self.program[self.register['PC']]()
             self.register['PC'] += 1
 
@@ -89,4 +92,4 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
 
 if __name__ == '__main__':
-    interp = Arm(32, 16, 1024, 8, False, False)
+    interp = Arm(32, 16, 1024, 8, False, True)
