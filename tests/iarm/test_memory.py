@@ -63,8 +63,8 @@ class TestArmMemory(TestArm):
 
         self.assertEqual(self.interp.register['R2'], 0x543210)
 
-        self.interp.labels['TEST2'] = 0x1234
-        self.interp.evaluate(" LDR R2, =TEST2")
+        self.interp.labels['LABEL'] = 0x1234
+        self.interp.evaluate(" LDR R2, =LABEL")
         self.interp.run()
 
         self.assertEqual(self.interp.register['R2'], 0x1234)
@@ -79,8 +79,8 @@ class TestArmMemory(TestArm):
 
         self.assertEqual(self.interp.register['R2'], 0x00000099)
 
-        self.interp.labels['TEST3'] = 1020
-        self.interp.evaluate(" LDR R2, TEST3")
+        self.interp.labels['SAMPLE'] = 1020
+        self.interp.evaluate(" LDR R2, SAMPLE")
         self.interp.run()
 
         self.assertEqual(self.interp.register['R2'], 1020)
@@ -103,8 +103,8 @@ class TestArmMemory(TestArm):
             self.interp.run()
 
         with self.assertRaises(iarm.exceptions.IarmError):
-            self.interp.labels['TEST4'] = 1024
-            self.interp.evaluate(" LDR R4, TEST4")
+            self.interp.labels['NEW'] = 1024
+            self.interp.evaluate(" LDR R4, NEW")
 
     def test_LDRB(self):
         self.interp.memory[8] = 0x12
@@ -181,13 +181,58 @@ class TestArmMemory(TestArm):
             self.interp.evaluate(" LDRH R7, [R5, #4]")
             self.interp.run()
 
-    @unittest.skip('No Test Defined')
+        with self.assertRaises(iarm.exceptions.IarmError):
+            # Cant use SP and regiser offset
+            self.interp.evaluate(" LDRH R7, [SP, R4]")
+
     def test_LDRSB(self):
-        pass
+        self.interp.memory[0] = 0xFF
+        self.interp.memory[1] = 0x7F
+        self.interp.memory[5] = 0x21
+        self.interp.register['R1'] = 0
+        self.interp.register['R2'] = 1
+        self.interp.register['R4'] = 4
+
+        self.interp.evaluate(" LDRSB R0, [R2, R1]")
+        self.interp.run()
+        self.assertEqual(self.interp.register['R0'], 0x0000007F)
+
+        self.interp.evaluate(" LDRSB R0, [R1, R1]")
+        self.interp.run()
+        self.assertEqual(self.interp.register['R0'], 0xFFFFFFFF)
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            # Can use immediates
+            self.interp.evaluate(" LDRSB R0, [R2, #0]")
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            # Can use SP
+            self.interp.evaluate(" LDRSB R0, [SP, R1]")
 
     @unittest.skip('No Test Defined')
     def test_LDRSH(self):
-        pass
+        self.interp.memory[0] = 0xFF
+        self.interp.memory[1] = 0x7F
+        self.interp.memory[5] = 0x21
+        self.interp.register['R1'] = 0
+        self.interp.register['R2'] = 1
+        self.interp.register['R4'] = 4
+
+        self.interp.evaluate(" LDRSB R0, [R2, R1]")
+        self.interp.run()
+        self.assertEqual(self.interp.register['R0'], 0x0000007F)
+
+        self.interp.evaluate(" LDRSB R0, [R1, R1]")
+        self.interp.run()
+        self.assertEqual(self.interp.register['R0'], 0xFFFFFFFF)
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            # Can use immediates
+            self.interp.evaluate(" LDRSB R0, [R2, #0]")
+
+        with self.assertRaises(iarm.exceptions.IarmError):
+            # Can use SP
+            self.interp.evaluate(" LDRSB R0, [SP, R1]")
 
     @unittest.skip('No Test Defined')
     def test_POP(self):
@@ -201,9 +246,40 @@ class TestArmMemory(TestArm):
     def test_STM(self):
         pass
 
-    @unittest.skip('No Test Defined')
     def test_STR(self):
-        pass
+        self.interp.register['R0'] = 0x12345678
+        self.interp.register['R1'] = 0
+        self.interp.register['R2'] = 4
+        self.interp.register['SP'] = 8
+
+        self.interp.evaluate(" STR R0, [R1, #0]")
+        self.interp.run()
+        self.assertEqual(self.interp.memory[0], 0x78)
+        self.assertEqual(self.interp.memory[1], 0x56)
+        self.assertEqual(self.interp.memory[2], 0x34)
+        self.assertEqual(self.interp.memory[3], 0x12)
+
+        self.interp.evaluate(" STR R0, [SP, #4]")
+        self.interp.run()
+        self.assertEqual(self.interp.memory[12], 0x78)
+        self.assertEqual(self.interp.memory[13], 0x56)
+        self.assertEqual(self.interp.memory[14], 0x34)
+        self.assertEqual(self.interp.memory[15], 0x12)
+
+        self.interp.evaluate(" STR R0, [R1, R2]")
+        self.interp.run()
+        self.assertEqual(self.interp.memory[4], 0x78)
+        self.assertEqual(self.interp.memory[5], 0x56)
+        self.assertEqual(self.interp.memory[6], 0x34)
+        self.assertEqual(self.interp.memory[7], 0x12)
+
+        self.interp.equates['TEST'] = 8
+        self.interp.evaluate(" STR R0, [R1, #TEST]")
+        self.interp.run()
+        self.assertEqual(self.interp.memory[8], 0x78)
+        self.assertEqual(self.interp.memory[9], 0x56)
+        self.assertEqual(self.interp.memory[10], 0x34)
+        self.assertEqual(self.interp.memory[11], 0x12)
 
     @unittest.skip('No Test Defined')
     def test_STRB(self):

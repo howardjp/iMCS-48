@@ -46,7 +46,7 @@ class Memory(_Meta):
                     label = int(self.convert_to_integer(label))
 
                 if int(label) % 4 != 0:
-                    raise iarm.exceptions.IarmError("Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb], int(Rc[1:])))
+                    raise iarm.exceptions.IarmError("Memory access not word aligned; Immediate: {}".format(int(label)))
             elif label.startswith('[') and label.endswith(']'):
                 # TODO improve this
                 Rb = label[1:-1]
@@ -164,7 +164,7 @@ class Memory(_Meta):
                 if (self.register[Rb] + self.register[Rc]) % 2 != 0:
                     raise iarm.exceptions.HardFault(
                         "Memory access not half word aligned; Register: {}  Immediate: {}".format(self.register[Rb],
-                                                                                             int(Rc[1:])))
+                                                                                                  self.register[Rc]))
                 self.register[Ra] = 0
                 for i in range(2):
                     self.register[Ra] |= (self.memory[self.register[Rb] + self.register[Rc] + i] << (8 * i))
@@ -194,6 +194,10 @@ class Memory(_Meta):
 
         def LDRSH_func():
             # TODO does memory read up?
+            if (self.register[Rb] + self.register[Rc]) % 2 != 0:
+                raise iarm.exceptions.HardFault(
+                    "Memory access not half word aligned\nR{}: {}\nR{}: {}".format(Rb, self.register[Rb],
+                                                                                   Rc, self.register[Rc]))
             self.register[Ra] = 0
             for i in range(2):
                 self.register[Ra] |= (self.memory[self.register[Rb] + self.register[Rc] + i] << (8 * i))
