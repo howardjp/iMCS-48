@@ -232,19 +232,14 @@ class _Meta(iarm.cpu.RegisterCpu):
         :param parameters:
         :return:
         """
+        # TODO find a better way to do the equate replacement
+        for rep in self.equates:
+            parameters = parameters.replace(rep, str(self.equates[rep]))
         match = re.match(regex_exp, parameters)
         if not match:
             raise iarm.exceptions.ParsingError("Parameters are None, did you miss a comma?")
 
-        # Do text replacement for equates
-        replaced_list = []
-        for item in match.groups():
-            if item in self.equates:
-                replaced_list.append(str(self.equates[item]))
-            else:
-                replaced_list.append(item)
-
-        return replaced_list
+        return match.groups()
 
     def get_one_parameter(self, regex_exp, parameters):
         """
