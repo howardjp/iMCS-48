@@ -7,7 +7,28 @@ class Memory(_Meta):
 
     def ADR(self, params):
         # TODO may need to rethink how I do PC, may need to be byte alligned
-        raise iarm.exceptions.NotImplementedError
+        # TODO This is wrong as each address is a word, not a byte. The filled value with its location (Do we want that, or the value at that location [Decompiled instruction])
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
+        except iarm.exceptions.ParsingError:
+            Ra, label = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+
+            # TODO the address must be within 1020 bytes of current PC
+            self.check_arguments(low_registers=(Ra,), label_exists=(label,))
+
+            def ADR_func():
+                self.register[Ra] = self.labels[label]  # TODO is this correct?
+
+            return ADR_func
+
+        self.check_arguments(low_registers=(Ra,), imm10_4=(Rc,))
+        if Rb != 'PC':
+            raise iarm.exceptions.IarmError("Second position argument is not PC: {}".format(Rb))
+
+        def ADR_func():
+            self.register[Ra] = self.register[Rb] + self.convert_to_integer(Rc[1:])
+
+        return ADR_func
 
     def LDM(self, params):
         # TODO what registers can be stored?
@@ -37,6 +58,8 @@ class Memory(_Meta):
                 # This is a pseudoinstructions
                 label = label[1:]
                 # TODO add check that label is a 32 bit number
+                # TODO This does not work on instruction loading. This interpreter follows a harvard like architecture,
+                # TODO while ARMv6-M (Cortex-M0+) is a Von Neumann architeture. Instructions will not be decompiled
                 self.check_arguments(low_registers=(Ra,))
                 if label in self.labels:
                     label = self.labels[label]
