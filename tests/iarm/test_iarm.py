@@ -7,7 +7,7 @@ import random
 class TestArm(unittest.TestCase):
     """The base class for all arm tests"""
     def setUp(self):
-        self.interp = iarm.arm.Arm(32, 16, 1024, 8, False)
+        self.interp = iarm.arm.Arm(1024, False)
 
 
 class TestArmChecks(TestArm):

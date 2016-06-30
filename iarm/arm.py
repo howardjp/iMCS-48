@@ -10,7 +10,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
           instructions.Misc, instructions.Directives):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(32, 16, 8, *args, **kwargs)
         self.register.link('PC', 'R15')
         self.register.link('LR', 'R14')
         self.register.link('SP', 'R13')
@@ -34,6 +34,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
             # Set the label to the next instruction
             if label:
                 # TODO how to integrate directives and instructions
+                # TODO this doesnt take care of labels that are not jumps (like DCD)
                 labels[label] = len(self.program) + len(program)
 
             # First, see if op is a directive
@@ -41,6 +42,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
             if op in self.directives:
                 try:
                     self.directives[op](label, params)  # Directives are run immediately
+                    labels.update(self.labels)  # TODO find better way to keep these up to date so they are not over written by the `self.labels.update(labels)` step
                     continue
                 except iarm.exceptions.IarmError:
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
@@ -92,4 +94,4 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
 
 if __name__ == '__main__':
-    interp = Arm(32, 16, 1024, 8, False, True)
+    interp = Arm(1024, False, False)
