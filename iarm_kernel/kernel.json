@@ -1,0 +1,4 @@
+{
+ "argv":["python","-m","iarm_kernel.iarmkernel", "-f", "{connection_file}"],
+ "display_name":"IArm"
+}
