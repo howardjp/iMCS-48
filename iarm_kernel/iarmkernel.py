@@ -47,31 +47,51 @@ class ArmKernel(Kernel):
             i = int(line)
         self.interpreter.run(i)
 
+    def run_magic(self, line):
+        # TODO allow magics at end of code block
+        # TODO allow more than one magic per block
+        if line.startswith('%'):
+            loc = line.find(' ')
+            params = ""
+            if loc > 0:
+                params = line[loc + 1:]
+                op = line[1:loc]
+            else:
+                op = line[1:]
+            self.magics[op](params)
+
+    def run_code(self, code):
+        if not code:
+            return
+        try:
+            self.interpreter.evaluate(code)
+        except Exception as e:
+            stream_content = {'name': 'stderr', 'text': str(e)}
+            self.send_response(self.iopub_socket, 'stream', stream_content)
+            return {'status': 'error',
+                    'execution_count': self.execution_count,
+                    'ename': type(e).__name__,
+                    'evalue': str(e),
+                    'traceback': '???'}
+
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
 
-        # TODO allow magics at end of code block
-        # TODO allow more than one magic per block
-        if code.startswith('%'):
-            loc = code.find(' ')
-            params = ""
-            if loc > 0:
-                params = code[loc + 1:]
-                op = code[1:loc]
+        instructions = ""
+        for line in code.split('\n'):
+            if line.startswith('%'):
+                # TODO run current code, run magic, then continue
+                ret = self.run_code(instructions)
+                if ret:
+                    return ret
+                instructions = ""
+                self.run_magic(line)
             else:
-                op = code[1:]
-            self.magics[op](params)
-        else:
-            try:
-                self.interpreter.evaluate(code)
-            except Exception as e:
-                stream_content = {'name': 'stderr', 'text': str(e)}
-                self.send_response(self.iopub_socket, 'stream', stream_content)
-                return {'status': 'error',
-                        'execution_count': self.execution_count,
-                        'ename': type(e).__name__,
-                        'evalue': str(e),
-                        'traceback': '???'}
+                instructions += line + '\n'
+        ret = self.run_code(instructions)
+        if ret:
+            return ret
+
         return {'status': 'ok',
                 'execution_count': self.execution_count,
                 'payload': [],
