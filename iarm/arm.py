@@ -49,21 +49,22 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
             # Next,
             # If the op lookup fails, it was a bad instruction
-            try:
-                func = self.ops[op]
-            except KeyError:
-                [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
-                raise iarm.exceptions.ValidationError("Instruction {} does not exist".format(op))
+            if op:
+                try:
+                    func = self.ops[op]
+                except KeyError:
+                    [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
+                    raise iarm.exceptions.ValidationError("Instruction {} does not exist".format(op))
 
-            # Run the instruction, if it raised an error, roll back the labels
-            try:
-                instruction = func(params)
-            except iarm.exceptions.IarmError:
-                # TODO We may have a key error, or something other than an IarmError
-                [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
-                raise
+                # Run the instruction, if it raised an error, roll back the labels
+                try:
+                    instruction = func(params)
+                except iarm.exceptions.IarmError:
+                    # TODO We may have a key error, or something other than an IarmError
+                    [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
+                    raise
 
-            program.append(instruction)  # It validated, add it to the temp instruction list
+                program.append(instruction)  # It validated, add it to the temp instruction list
 
         # Code block was successfully validated, update the main program
         self.program += program
