@@ -1,5 +1,6 @@
 from ipykernel.kernelbase import Kernel
 from iarm.arm import Arm
+import re
 
 
 class ArmKernel(Kernel):
@@ -26,10 +27,19 @@ class ArmKernel(Kernel):
                        }
 
     def magic_register(self, line):
-        # TODO allow for ranges
         message = ""
         for reg in [i.strip() for i in line.replace(',', '').split()]:
-            message += "{}: {}\n".format(reg, self.interpreter.register[reg])
+            if '-' in reg:
+                # We have a range (Rn-Rk)
+                r1, r2 = reg.split('-')
+                n1 = re.search(r'\d', r1).group()
+                n2 = re.search(r'\d', r2).group()
+                n1 = self.interpreter.convert_to_integer(n1)
+                n2 = self.interpreter.convert_to_integer(n2)
+                for i in range(n1, n2+1):
+                    message += "{}: {}\n".format(r1[0] + str(i), self.interpreter.register[r1[0] + str(i)])
+            else:
+                message += "{}: {}\n".format(reg, self.interpreter.register[reg])
         stream_content = {'name': 'stdout', 'text': message}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
