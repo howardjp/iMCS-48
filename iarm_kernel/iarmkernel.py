@@ -9,7 +9,7 @@ class ArmKernel(Kernel):
     language = 'ARM'
     language_version = '0.1'
     language_info = {
-        'name': 'ARM Coretex M0+ Assembly',
+        'name': 'ARM Coretex M0+ Thumb Assembly',
         'mimetype': 'text/x-asm',
         'file_extension': '.s'
     }
@@ -32,8 +32,8 @@ class ArmKernel(Kernel):
             if '-' in reg:
                 # We have a range (Rn-Rk)
                 r1, r2 = reg.split('-')
-                n1 = re.search(r'\d', r1).group()
-                n2 = re.search(r'\d', r2).group()
+                n1 = re.search(self.interpreter.REGISTER_REGEX, r1).groups()[0]
+                n2 = re.search(self.interpreter.REGISTER_REGEX, r2).groups()[0]
                 n1 = self.interpreter.convert_to_integer(n1)
                 n2 = self.interpreter.convert_to_integer(n2)
                 for i in range(n1, n2+1):
@@ -47,7 +47,19 @@ class ArmKernel(Kernel):
         # TODO allow for ranges
         message = ""
         for address in [i.strip() for i in line.replace(',', '').split()]:
-            message += "{}: {}\n".format(address, self.interpreter.memory[address])
+            if '-' in address:
+                # We have a range (n-k)
+                m1, m2 = address.split('-')
+                # TODO use the immedaite regex somehow (cant use it because of the # symbol
+                n1 = re.search(r'(0[xX][0-9a-zA-Z]+|2_\d+|\d+)', m1).groups()[0]
+                n2 = re.search(r'(0[xX][0-9a-zA-Z]+|2_\d+|\d+)', m2).groups()[0]
+                n1 = self.interpreter.convert_to_integer(n1)
+                n2 = self.interpreter.convert_to_integer(n2)
+                for i in range(n1, n2 + 1):
+                    message += "{}: {}\n".format(str(i), self.interpreter.memory[i])
+            else:
+                # TODO fix what is the key for memory (currently it's an int, but registers are strings, should it be the same?)
+                message += "{}: {}\n".format(address, self.interpreter.memory[self.interpreter.convert_to_integer(address)])
         stream_content = {'name': 'stdout', 'text': message}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
@@ -56,6 +68,8 @@ class ArmKernel(Kernel):
         if line.strip():
             i = int(line)
         self.interpreter.run(i)
+
+    # TODO add support for outputing hex values, signed values, anc access to the generate random and postpone execution vars
 
     def run_magic(self, line):
         # TODO allow magics at end of code block
