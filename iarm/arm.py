@@ -44,17 +44,19 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                     self.directives[op](label, params)  # Directives are run immediately
                     labels.update(self.labels)  # TODO find better way to keep these up to date so they are not over written by the `self.labels.update(labels)` step
                     continue
-                except iarm.exceptions.IarmError:
+                except Exception as e:
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
+                    e.args = ("Error on '{}': ".format(label + ' ' + op + ' ' + params),) + e.args
+                    raise
 
             # Next,
             # If the op lookup fails, it was a bad instruction
             if op:
                 try:
                     func = self.ops[op]
-                except KeyError:
+                except KeyError as e:
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
-                    raise iarm.exceptions.ValidationError("Instruction {} does not exist".format(op))
+                    raise iarm.exceptions.ValidationError("Error on '{}': Instruction {} does not exist".format(label + ' ' + op + ' ' + params, op))
 
                 # Run the instruction, if it raised an error, roll back the labels
                 try:
@@ -62,7 +64,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                 except Exception as e:
                     # TODO We may have a key error, or something other than an IarmError
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
-                    e.args = ("Error on '{}': ".format(label  + ' ' + op + ' ' + params),) + e.args
+                    e.args = ("Error on '{}': ".format(label + ' ' + op + ' ' + params),) + e.args
                     raise
 
                 program.append(instruction)  # It validated, add it to the temp instruction list
