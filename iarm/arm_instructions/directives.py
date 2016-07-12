@@ -119,3 +119,6 @@ class Directives(_Meta):
             params = self.equates[params]
         self.memory[self.space_pointer] = self.convert_to_integer(params) & 0xFF
         self.space_pointer += 1
+
+    def directive_OPT(self, label, params):
+        warnings.warn("OPT directive is not yet implemented")
