@@ -59,9 +59,10 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                 # Run the instruction, if it raised an error, roll back the labels
                 try:
                     instruction = func(params)
-                except iarm.exceptions.IarmError:
+                except Exception as e:
                     # TODO We may have a key error, or something other than an IarmError
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
+                    e.args = ("Error on '{}': ".format(label  + ' ' + op + ' ' + params),) + e.args
                     raise
 
                 program.append(instruction)  # It validated, add it to the temp instruction list
