@@ -111,7 +111,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         return self.convert_to_integer(match.groups()[0])
 
     def convert_to_integer(self, str):
-        if str.startswith('0x'):
+        if str.startswith('0x') or str.startswith('0X'):
             return int(str, 16)
         elif str.startswith('2_'):
             return int(str[2:], 2)
