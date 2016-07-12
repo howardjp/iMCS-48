@@ -32,6 +32,7 @@ class ArmKernel(Kernel):
             if '-' in reg:
                 # We have a range (Rn-Rk)
                 r1, r2 = reg.split('-')
+                # TODO do we want to allow just numbers?
                 n1 = re.search(self.interpreter.REGISTER_REGEX, r1).groups()[0]
                 n2 = re.search(self.interpreter.REGISTER_REGEX, r2).groups()[0]
                 n1 = self.interpreter.convert_to_integer(n1)
@@ -44,15 +45,13 @@ class ArmKernel(Kernel):
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
     def magic_memory(self, line):
-        # TODO allow for ranges
         message = ""
         for address in [i.strip() for i in line.replace(',', '').split()]:
             if '-' in address:
                 # We have a range (n-k)
                 m1, m2 = address.split('-')
-                # TODO use the immedaite regex somehow (cant use it because of the # symbol
-                n1 = re.search(r'(0[xX][0-9a-zA-Z]+|2_\d+|\d+)', m1).groups()[0]
-                n2 = re.search(r'(0[xX][0-9a-zA-Z]+|2_\d+|\d+)', m2).groups()[0]
+                n1 = re.search(self.interpreter.IMMEDIATE_NUMBER, m1).groups()[0]
+                n2 = re.search(self.interpreter.IMMEDIATE_NUMBER, m2).groups()[0]
                 n1 = self.interpreter.convert_to_integer(n1)
                 n2 = self.interpreter.convert_to_integer(n2)
                 for i in range(n1, n2 + 1):

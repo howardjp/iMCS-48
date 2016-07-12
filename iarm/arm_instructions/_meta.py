@@ -8,8 +8,10 @@ class _Meta(iarm.cpu.RegisterCpu):
     """
     Give helper functions to the instructions
     """
-    REGISTER_REGEX = r'^R(\d+)$'
-    IMMEDIATE_REGEX = r'^#(0[xX][0-9a-zA-Z]+|2_\d+|\d+)$'
+    REGISTER_NUMBER = r'(\d+)'
+    REGISTER_REGEX = r'^R{}$'.format(REGISTER_NUMBER)
+    IMMEDIATE_NUMBER = r'(0[xX][0-9a-zA-Z]+|2_\d+|\d+)'
+    IMMEDIATE_REGEX = r'^#{}$'.format(IMMEDIATE_NUMBER)
     ONE_PARAMETER = r'\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
     TWO_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
     THREE_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
