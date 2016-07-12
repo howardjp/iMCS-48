@@ -1,6 +1,7 @@
 from ipykernel.kernelbase import Kernel
 from iarm.arm import Arm
 import re
+import warnings
 
 
 class ArmKernel(Kernel):
@@ -87,10 +88,16 @@ class ArmKernel(Kernel):
         if not code:
             return
         try:
-            self.interpreter.evaluate(code)
+            with warnings.catch_warnings(record=True) as w:
+                self.interpreter.evaluate(code)
+                for warning_message in w:
+                    # TODO should this be stdout or stderr
+                    stream_content = {'name': 'stdout', 'text': 'Warning: ' + str(warning_message.message) + '\n'}
+                    self.send_response(self.iopub_socket, 'stream', stream_content)
         except Exception as e:
-            stream_content = {'name': 'stderr', 'text': str(e)}
-            self.send_response(self.iopub_socket, 'stream', stream_content)
+            for err in e.args:
+                stream_content = {'name': 'stderr', 'text': str(err)}
+                self.send_response(self.iopub_socket, 'stream', stream_content)
             return {'status': 'error',
                     'execution_count': self.execution_count,
                     'ename': type(e).__name__,
