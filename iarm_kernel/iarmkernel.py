@@ -2,6 +2,7 @@ from ipykernel.kernelbase import Kernel
 from iarm.arm import Arm
 import re
 import warnings
+import iarm.exceptions
 
 
 class ArmKernel(Kernel):
@@ -67,7 +68,26 @@ class ArmKernel(Kernel):
         i = float('inf')
         if line.strip():
             i = int(line)
-        self.interpreter.run(i)
+
+        try:
+            with warnings.catch_warnings(record=True) as w:
+                self.interpreter.run(i)
+                for warning_message in w:
+                    # TODO should this be stdout or stderr
+                    stream_content = {'name': 'stdout', 'text': 'Warning: ' + str(warning_message.message) + '\n'}
+                    self.send_response(self.iopub_socket, 'stream', stream_content)
+        except iarm.exceptions.EndOfProgram as e:
+            stream_content = {'name': 'stdout', 'text': 'Warning: ' + str(e) + '\n'}
+            self.send_response(self.iopub_socket, 'stream', stream_content)
+        except Exception as e:
+            for err in e.args:
+                stream_content = {'name': 'stderr', 'text': str(err)}
+                self.send_response(self.iopub_socket, 'stream', stream_content)
+            return {'status': 'error',
+                    'execution_count': self.execution_count,
+                    'ename': type(e).__name__,
+                    'evalue': str(e),
+                    'traceback': '???'}
 
     # TODO add support for outputing hex values, signed values, anc access to the generate random and postpone execution vars
 
@@ -82,7 +102,7 @@ class ArmKernel(Kernel):
                 op = line[1:loc]
             else:
                 op = line[1:]
-            self.magics[op](params)
+            return self.magics[op](params)
 
     def run_code(self, code):
         if not code:
@@ -115,7 +135,9 @@ class ArmKernel(Kernel):
                 if ret:
                     return ret
                 instructions = ""
-                self.run_magic(line)
+                ret = self.run_magic(line)
+                if ret:
+                    return ret
             else:
                 instructions += line + '\n'
         ret = self.run_code(instructions)
