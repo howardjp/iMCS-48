@@ -29,9 +29,9 @@ class Directives(_Meta):
     def directive_TTL(self, label, params):
         self.title = params
 
-    def directive_THUMB(self):
+    def directive_THUMB(self, label, params):
         # TODO should this set something?
-        warnings.warn("This directive is not yet implemented")
+        warnings.warn("THUMB directive is not yet implemented")
 
     def directive_EQU(self, label, params):
         # TODO do a check on params
@@ -43,19 +43,28 @@ class Directives(_Meta):
 
     def directive_AREA(self, label, params):
         # TODO do something
-        warnings.warn("This directive is not yet implemented")
+        warnings.warn("AREA directive is not yet implemented")
 
     def directive_EXPORT(self, label, params):
         # TODO do something
-        warnings.warn("This directive is not yet implemented")
+        warnings.warn("EXPORT directive is not yet implemented")
 
     def directive_ALIGN(self, label, params):
-        warnings.warn("This directive is not yet implemented")
+        warnings.warn("ALIGN directive is not yet implemented")
 
     def directive_ENTRY(self, label, params):
-        warnings.warn("This directive is not yet implemented")
+        warnings.warn("ENTRY directive is not yet implemented")
 
     def directive_SPACE(self, label, params):
+        # TODO allow equations
+
+        params = params.strip()
+        try:
+            self.convert_to_integer(params)
+        except ValueError:
+            warnings.warn("Unknown parameters; {}".format(params))
+            return
+
         self.labels[label] = self.space_pointer
         if params in self.equates:
             params = self.equates[params]
@@ -69,6 +78,14 @@ class Directives(_Meta):
         # TODO make this read only
         # TODO check for param size
         # TODO can take any length comma separated values (VAL DCD 1, 0x2, 3, 4
+
+        params = params.strip()
+        try:
+            self.convert_to_integer(params)
+        except ValueError:
+            # TODO allow word DCDs (like SP_INIT, Reset_Handler)
+            warnings.warn("Cannot reserve constant words; {}".format(params))
+            return
 
         # Align address
         if self.space_pointer % 4 != 0:
