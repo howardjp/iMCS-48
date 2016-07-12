@@ -66,7 +66,10 @@ class Memory(_Meta):
                 elif label in self.equates:
                     label = self.equates[label]
                 else:
-                    label = int(self.convert_to_integer(label))
+                    try:
+                        label = int(self.convert_to_integer(label))
+                    except ValueError:
+                        raise iarm.exceptions.IarmError("'{}' is not a label, equate, or parsable integer".format(label))
 
                 if int(label) % 4 != 0:
                     raise iarm.exceptions.IarmError("Memory access not word aligned; Immediate: {}".format(int(label)))
