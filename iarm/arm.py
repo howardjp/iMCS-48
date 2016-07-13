@@ -32,6 +32,9 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                 continue  # We have a blank line
             label, op, params = line
 
+            if not op and params.strip():
+                raise iarm.exceptions.ParsingError("Parameters found but no instruction; {}".format(line))
+
             # Set the label to the next instruction
             if label:
                 # TODO how to integrate directives and instructions
