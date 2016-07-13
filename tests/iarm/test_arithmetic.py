@@ -36,6 +36,8 @@ class TestArmArithmetic(TestArm):
             self.interp.evaluate(" ADD R0, R1, R2")
 
     def test_ADD_PC(self):
+        # remember, the PC points to the NEXT instruction
+        # TODO PC needs to be byte addressed, not word addressed
         self.interp.register['R0'] = 1
         self.interp.register['PC'] = 1
 
