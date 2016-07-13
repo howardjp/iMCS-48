@@ -97,7 +97,10 @@ class ArmKernel(Kernel):
                     stream_content = {'name': 'stdout', 'text': 'Warning: ' + str(warning_message.message) + '\n'}
                     self.send_response(self.iopub_socket, 'stream', stream_content)
         except iarm.exceptions.EndOfProgram as e:
-            stream_content = {'name': 'stdout', 'text': 'Warning: ' + str(e) + '\n'}
+            f_name = self.interpreter.program[self.interpreter.register['PC'] - 1].__name__
+            f_name = f_name[:f_name.find('_')]
+            message = "Error in {}: ".format(f_name)
+            stream_content = {'name': 'stdout', 'text': message + str(e) + '\n'}
             self.send_response(self.iopub_socket, 'stream', stream_content)
         except Exception as e:
             for err in e.args:
