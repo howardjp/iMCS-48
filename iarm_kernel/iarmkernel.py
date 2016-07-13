@@ -34,6 +34,8 @@ class ArmKernel(Kernel):
     def convert_to_signed_int(self, i):
         if i & (1 << self.interpreter._bit_width - 1):
             return -((~i + 1) & (2**self.interpreter._bit_width - 1))
+        else:
+            return i
 
     def magic_signed_rep(self, line):
         line = line.strip().lower()
