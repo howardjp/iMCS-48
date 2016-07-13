@@ -14,7 +14,8 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
         self.register.link('PC', 'R15')
         self.register.link('LR', 'R14')
         self.register.link('SP', 'R13')
-        self.register['PC'] = 0
+        self.register['PC'] = 1  # PC points to the next instruction in THUMB mode
+        # http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0473f/Babbdajb.html
 
     def evaluate(self, code):
         parsed = self.parse_lines(code)
@@ -81,11 +82,11 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
         Run to the current end of the program or a number of steps
         :return:
         """
-        while len(self.program) > self.register['PC']:
+        while len(self.program) > (self.register['PC'] - 1):
             steps -= 1
             if steps < 0:
                 break
-            self.program[self.register['PC']]()
+            self.program[self.register['PC'] - 1]()
             self.register['PC'] += 1
 
     def print_status_bits(self):
