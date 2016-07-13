@@ -7,8 +7,7 @@ USER main
 
 # Install IArm
 # TODO replace with `pip install iarm`
-RUN cd iarm && \
-    python setup.py install
+RUN python setup.py install
 
 # Install the IArm kernel
 RUN python -m iarm_kernel.install
