@@ -6,10 +6,8 @@ MAINTAINER Joshua Milas <josh.milas@gmail.com>
 USER main
 
 # Install IArm
-#Clone the repo
 # TODO replace with `pip install iarm`
-RUN git clone https://github.com/DeepHorizons/iarm && \
-    cd iarm && \
+RUN cd iarm && \
     python setup.py install
 
 # Install the IArm kernel
