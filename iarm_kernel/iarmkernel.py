@@ -25,8 +25,22 @@ class ArmKernel(Kernel):
             'register': self.magic_register,
             'reg': self.magic_register,
             'memory': self.magic_memory,
-            'mem': self.magic_memory
+            'mem': self.magic_memory,
+            'signed': self.magic_signed_rep
                        }
+
+        self.signed_representation = False
+
+    def convert_to_signed_int(self, i):
+        if i & (1 << self.interpreter._bit_width - 1):
+            return -((~i + 1) & (2**self.interpreter._bit_width - 1))
+
+    def magic_signed_rep(self, line):
+        line = line.strip().lower()
+        if line == '1' or line == 'true' or not line:
+            self.signed_representation = True
+        else:
+            self.signed_representation = False
 
     def magic_register(self, line):
         message = ""
@@ -40,9 +54,15 @@ class ArmKernel(Kernel):
                 n1 = self.interpreter.convert_to_integer(n1)
                 n2 = self.interpreter.convert_to_integer(n2)
                 for i in range(n1, n2+1):
-                    message += "{}: {}\n".format(r1[0] + str(i), self.interpreter.register[r1[0] + str(i)])
+                    val = self.interpreter.register[r1[0] + str(i)]
+                    if self.signed_representation:
+                        val = self.convert_to_signed_int(val)
+                    message += "{}: {}\n".format(r1[0] + str(i), val)
             else:
-                message += "{}: {}\n".format(reg, self.interpreter.register[reg])
+                val = self.interpreter.register[reg]
+                if self.signed_representation:
+                    val = self.convert_to_signed_int(val)
+                message += "{}: {}\n".format(reg, val)
         stream_content = {'name': 'stdout', 'text': message}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
