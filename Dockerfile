@@ -3,7 +3,7 @@ FROM andrewosh/binder-python-3.5-mini
 
 MAINTAINER Joshua Milas <josh.milas@gmail.com>
 
-USER main
+USER root
 
 # Install IArm
 # TODO replace with `pip install iarm`
@@ -11,3 +11,5 @@ RUN python setup.py install
 
 # Install the IArm kernel
 RUN python -m iarm_kernel.install
+
+USER main
