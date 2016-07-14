@@ -58,3 +58,23 @@ Therefor, the PC increments in sets of 1, not 4.
 
 Since the code is not actually compiled,
 we cannot produce a map file or listing file.
+
+The code can be organized however the user wants.
+Each line of the code is processed, one at a time.
+Code is put into a temporary store,
+and if all the code is processed without an error the store is appended
+to the program.
+This enables some feedback, and allows you to fix errors.
+Although as soon as it is correct, that code is put into the program and cannot
+be removed.
+Therefor, if there is a piece of code that needs to be changed,
+the kernel will need to be restarted.
+This is not true for subroutines, labels can be changed mid run and their
+references will be updated.
+Therefor, it makes sense to put one subroutine per cell that can be updated.
+
+Once a `B .` instruction has been executed, no more code will run.
+The kernel will need to be restarted.
+
+There is currently no mechanism for breakpoints,
+but there are plans for them to be added.
