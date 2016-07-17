@@ -50,5 +50,9 @@ class TestArmValidation(TestArm):
         with self.assertRaises(iarm.exceptions.ValidationError):
             self.interp.evaluate(' BADINST')
 
+    def test_bad_formatting(self):
+        with self.assertRaises(iarm.exceptions.ValidationError):
+            self.interp.evaluate('B .')  # `B .` used to pass because `.` is not letter, had to fix regex
+
 if __name__ == '__main__':
     unittest.main()
