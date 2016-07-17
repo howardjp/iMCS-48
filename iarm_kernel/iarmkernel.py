@@ -210,7 +210,7 @@ class ArmKernel(Kernel):
                     self.send_response(self.iopub_socket, 'stream', stream_content)
         except Exception as e:
             for err in e.args:
-                stream_content = {'name': 'stderr', 'text': str(err)}
+                stream_content = {'name': 'stderr', 'text': "{}\n{}".format(type(e).__name__, str(err))}
                 self.send_response(self.iopub_socket, 'stream', stream_content)
             return {'status': 'error',
                     'execution_count': self.execution_count,
