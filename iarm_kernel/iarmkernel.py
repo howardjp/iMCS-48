@@ -33,7 +33,7 @@ class ArmKernel(Kernel):
                        }
 
         self.number_representation = ''
-        self.magic_unsigned_rep('')
+        self.magic_unsigned_rep('')  # Default to unsigned representation
 
     def convert_representation(self, i):
         if self.number_representation == 'unsigned':
@@ -137,10 +137,14 @@ class ArmKernel(Kernel):
                 n1 = self.interpreter.convert_to_integer(n1)
                 n2 = self.interpreter.convert_to_integer(n2)
                 for i in range(n1, n2 + 1):
-                    message += "{}: {}\n".format(str(i), self.interpreter.memory[i])
+                    val = self.interpreter.memory[i]
+                    val = self.convert_representation(val)
+                    message += "{}: {}\n".format(str(i), val)
             else:
                 # TODO fix what is the key for memory (currently it's an int, but registers are strings, should it be the same?)
-                message += "{}: {}\n".format(address, self.interpreter.memory[self.interpreter.convert_to_integer(address)])
+                val = self.interpreter.memory[self.interpreter.convert_to_integer(address)]
+                val = self.convert_representation(val)
+                message += "{}: {}\n".format(address, val)
         stream_content = {'name': 'stdout', 'text': message}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
