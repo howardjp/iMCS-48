@@ -26,7 +26,8 @@ class ArmKernel(Kernel):
             'reg': self.magic_register,
             'memory': self.magic_memory,
             'mem': self.magic_memory,
-            'signed': self.magic_signed_rep
+            'signed': self.magic_signed_rep,
+            'help': self.magic_help,
                        }
 
         self.signed_representation = False
@@ -38,6 +39,14 @@ class ArmKernel(Kernel):
             return i
 
     def magic_signed_rep(self, line):
+        """
+        Convert all values to it's signed representation
+
+        Usage:
+        Just call this magic
+
+        `%signed`
+        """
         line = line.strip().lower()
         if line == '1' or line == 'true' or not line:
             self.signed_representation = True
@@ -45,6 +54,19 @@ class ArmKernel(Kernel):
             self.signed_representation = False
 
     def magic_register(self, line):
+        """
+        Print out the current value of a register
+
+        Usage:
+        Pass in the register, or a list of registers separated by spaces
+        A list of registeres can be entered by separating them by a hyphen
+
+        `%reg R1`
+        or
+        `%reg R0 R5 R6`
+        or
+        `%reg R8-R12`
+        """
         message = ""
         for reg in [i.strip() for i in line.replace(',', '').split()]:
             if '-' in reg:
@@ -69,6 +91,18 @@ class ArmKernel(Kernel):
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
     def magic_memory(self, line):
+        """
+        Print out the current value of memory
+
+        Usage:
+        Pass in the byte of memory to read, separated by spaced
+        A list of memory contents can be entered by separating them by a hyphen
+
+        `%mem 4 5`
+        or
+        `%mem 8-12`
+        """
+        # TODO add support for directives
         message = ""
         for address in [i.strip() for i in line.replace(',', '').split()]:
             if '-' in address:
@@ -87,6 +121,17 @@ class ArmKernel(Kernel):
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
     def magic_run(self, line):
+        """
+        Run the current program
+
+        Usage:
+        Call with a numbe rto run that many steps,
+        or call with no arguments to run to the end of the current program
+
+        `%run`
+        or
+        `%run 1`
+        """
         i = float('inf')
         if line.strip():
             i = int(line)
@@ -113,6 +158,30 @@ class ArmKernel(Kernel):
                     'ename': type(e).__name__,
                     'evalue': str(e),
                     'traceback': '???'}
+
+    def magic_help(self, line):
+        """
+        Print out the help for magics
+
+        Usage:
+        Call help with no arguments to list all magics,
+        or call it with a magic to print out it's help info.
+
+        `%help`
+        or
+        `%help run
+        """
+        line = line.strip()
+        if not line:
+            for magic in self.magics:
+                stream_content = {'name': 'stdout', 'text': "%{}\n".format(magic)}
+                self.send_response(self.iopub_socket, 'stream', stream_content)
+        elif line not in self.magics:
+            stream_content = {'name': 'stderr', 'text': "'{}' not a known magic".format(line)}
+            self.send_response(self.iopub_socket, 'stream', stream_content)
+        else:
+            stream_content = {'name': 'stdout', 'text': "{}\n{}".format(line, self.magics[line].__doc__)}
+            self.send_response(self.iopub_socket, 'stream', stream_content)
 
     # TODO add support for outputing hex values, signed values, anc access to the generate random and postpone execution vars
 
