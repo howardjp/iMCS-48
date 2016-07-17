@@ -27,16 +27,24 @@ class ArmKernel(Kernel):
             'memory': self.magic_memory,
             'mem': self.magic_memory,
             'signed': self.magic_signed_rep,
+            'unsigned': self.magic_unsigned_rep,
+            'hex': self.magic_hex_rep,
             'help': self.magic_help,
                        }
 
-        self.signed_representation = False
+        self.number_representation = ''
+        self.magic_unsigned_rep('')
 
-    def convert_to_signed_int(self, i):
-        if i & (1 << self.interpreter._bit_width - 1):
-            return -((~i + 1) & (2**self.interpreter._bit_width - 1))
-        else:
+    def convert_representation(self, i):
+        if self.number_representation == 'unsigned':
             return i
+        elif self.number_representation == 'signed':
+            if i & (1 << self.interpreter._bit_width - 1):
+                return -((~i + 1) & (2**self.interpreter._bit_width - 1))
+            else:
+                return i
+        elif self.number_representation == 'hex':
+            return hex(i)
 
     def magic_signed_rep(self, line):
         """
@@ -47,11 +55,29 @@ class ArmKernel(Kernel):
 
         `%signed`
         """
-        line = line.strip().lower()
-        if line == '1' or line == 'true' or not line:
-            self.signed_representation = True
-        else:
-            self.signed_representation = False
+        self.number_representation = 'signed'
+
+    def magic_unsigned_rep(self, line):
+        """
+        All outputted values will be displayed with their unsigned representation
+
+        Usage:
+        Just call this magic
+
+        `%unsigned`
+        """
+        self.number_representation = 'unsigned'
+
+    def magic_hex_rep(self, line):
+        """
+        All outputed values will be displayed with their unsigned representation
+
+        Usage:
+        Just call this magic
+
+        `%hex`
+        """
+        self.number_representation = 'hex'
 
     def magic_register(self, line):
         """
@@ -79,13 +105,11 @@ class ArmKernel(Kernel):
                 n2 = self.interpreter.convert_to_integer(n2)
                 for i in range(n1, n2+1):
                     val = self.interpreter.register[r1[0] + str(i)]
-                    if self.signed_representation:
-                        val = self.convert_to_signed_int(val)
+                    val = self.convert_representation(val)
                     message += "{}: {}\n".format(r1[0] + str(i), val)
             else:
                 val = self.interpreter.register[reg]
-                if self.signed_representation:
-                    val = self.convert_to_signed_int(val)
+                val = self.convert_representation(val)
                 message += "{}: {}\n".format(reg, val)
         stream_content = {'name': 'stdout', 'text': message}
         self.send_response(self.iopub_socket, 'stream', stream_content)
@@ -183,7 +207,7 @@ class ArmKernel(Kernel):
             stream_content = {'name': 'stdout', 'text': "{}\n{}".format(line, self.magics[line].__doc__)}
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
-    # TODO add support for outputing hex values, signed values, anc access to the generate random and postpone execution vars
+    # TODO add support for access to the generate random and postpone execution vars
 
     def run_magic(self, line):
         # TODO allow magics at end of code block
