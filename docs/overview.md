@@ -23,7 +23,7 @@ Registers and memory are implemented as python dictionaries with a few extra
 added features.
 These features include the ability to randomly generate values if a value has
 not been set (mimicking real hardware),
-and the ability to link two entries (Like `LR` and `R14).
+and the ability to link two entries (Like `LR` and `R14`).
 Registers are accessed by their string,
 while memory is accessed by its byte address.
 

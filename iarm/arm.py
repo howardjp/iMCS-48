@@ -60,7 +60,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                     func = self.ops[op]
                 except KeyError as e:
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
-                    raise iarm.exceptions.ValidationError("Error on '{}': Instruction {} does not exist".format(label + ' ' + op + ' ' + params, op))
+                    raise iarm.exceptions.ValidationError("Error on '{}': Instruction '{}' does not exist".format(label + ' ' + op + ' ' + params, op))
 
                 # Run the instruction, if it raised an error, roll back the labels
                 try:
