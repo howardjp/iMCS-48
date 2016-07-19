@@ -68,6 +68,16 @@ class RegisterCpu(object):
         # must be implemented on inheriting classes
         raise NotImplementedError("The class cant determine how to run the code")
 
+    @property
+    def generate_random(self):
+        return self._generate_random
+
+    @generate_random.setter
+    def generate_random(self, value):
+        self._generate_random = value
+        self.memory._generate_random = value
+        self.register._generate_random = value
+
 
 class RandomValueDict(dict):
     """

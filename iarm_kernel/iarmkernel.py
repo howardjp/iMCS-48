@@ -30,12 +30,16 @@ class ArmKernel(Kernel):
             'unsigned': self.magic_unsigned_rep,
             'hex': self.magic_hex_rep,
             'help': self.magic_help,
+            'generate_random': self.magic_generate_random,
                        }
 
         self.number_representation = ''
         self.magic_unsigned_rep('')  # Default to unsigned representation
 
     def convert_representation(self, i):
+        """
+        Return the proper representation for the given integer
+        """
         if self.number_representation == 'unsigned':
             return i
         elif self.number_representation == 'signed':
@@ -45,6 +49,34 @@ class ArmKernel(Kernel):
                 return i
         elif self.number_representation == 'hex':
             return hex(i)
+
+    def magic_generate_random(self, line):
+        """
+        Set the generate random flag, unset registers and memory will return a random value.
+
+        Usage:
+        Call the magic by itself or with `true` to have registers and memory return a random value
+        if they are unset and read from, much like how real hardware would work.
+
+        `%generate_random`
+        or
+        `%generate_random true`
+        or
+        `%generate_random false`
+        """
+        line = line.strip().lower()
+        if not line or line == 'true':
+            self.interpreter.generate_random = True
+        elif line == 'false':
+            self.interpreter.generate_random = False
+        else:
+            stream_content = {'name': 'stderr', 'text': "unknwon value '{}'".format(line)}
+            self.send_response(self.iopub_socket, 'stream', stream_content)
+            return {'status': 'error',
+                    'execution_count': self.execution_count,
+                    'ename': ValueError.__name__,
+                    'evalue': "unknwon value '{}'".format(line),
+                    'traceback': '???'}
 
     def magic_signed_rep(self, line):
         """
@@ -70,7 +102,7 @@ class ArmKernel(Kernel):
 
     def magic_hex_rep(self, line):
         """
-        All outputed values will be displayed with their unsigned representation
+        All outputed values will be displayed with their hexadecimal representation
 
         Usage:
         Just call this magic
