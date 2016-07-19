@@ -78,6 +78,10 @@ class RegisterCpu(object):
         self.memory._generate_random = value
         self.register._generate_random = value
 
+    @property
+    def postpone_execution(self):
+        return self._postpone_execution
+
 
 class RandomValueDict(dict):
     """

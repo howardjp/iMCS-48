@@ -31,6 +31,7 @@ class ArmKernel(Kernel):
             'hex': self.magic_hex_rep,
             'help': self.magic_help,
             'generate_random': self.magic_generate_random,
+            'postpone_execution': self.magic_postpone_execution
                        }
 
         self.number_representation = ''
@@ -57,6 +58,7 @@ class ArmKernel(Kernel):
         Usage:
         Call the magic by itself or with `true` to have registers and memory return a random value
         if they are unset and read from, much like how real hardware would work.
+        Defaults to False, or to not generate random values
 
         `%generate_random`
         or
@@ -69,6 +71,38 @@ class ArmKernel(Kernel):
             self.interpreter.generate_random = True
         elif line == 'false':
             self.interpreter.generate_random = False
+        else:
+            stream_content = {'name': 'stderr', 'text': "unknwon value '{}'".format(line)}
+            self.send_response(self.iopub_socket, 'stream', stream_content)
+            return {'status': 'error',
+                    'execution_count': self.execution_count,
+                    'ename': ValueError.__name__,
+                    'evalue': "unknwon value '{}'".format(line),
+                    'traceback': '???'}
+
+    def magic_postpone_execution(self, line):
+        """
+        Postpone execution of instructions until explicitly run
+
+        Usage:
+        Call this magic with `true` or nothing to postpone execution,
+        or call with `false` to execute each instruction when evaluated.
+        This defaults to True.
+
+        Note that each cell is executed only executed after all lines in
+        the cell have been evaluated properly.
+
+        `%postpone_execution`
+        or
+        `%postpone_execution true`
+        or
+        `%postpone_execution false`
+        """
+        line = line.strip().lower()
+        if not line or line == 'true':
+            self.interpreter.postpone_execution = True
+        elif line == 'false':
+            self.interpreter.postpone_execution = False
         else:
             stream_content = {'name': 'stderr', 'text': "unknwon value '{}'".format(line)}
             self.send_response(self.iopub_socket, 'stream', stream_content)
