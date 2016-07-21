@@ -43,7 +43,7 @@ class UnconditionalBranch(_Meta):
 
         # BL label
         def BL_func():
-            self.register['LR'] = self.register['PC'] - 2  # TODO I think this is wrong
+            self.register['LR'] = self.register['PC']  # No need for the + 1, PC already points to the next instruction
             self.register['PC'] = self.labels[label]
 
         return BL_func
@@ -59,7 +59,7 @@ class UnconditionalBranch(_Meta):
         self.check_arguments(LR_or_general_purpose_registers=(Rj,))
 
         def BLX_func():
-            self.register['LR'] = self.register['PC'] - 2
+            self.register['LR'] = self.register['PC']  # No need for the + 1, PC already points to the next instruction
             self.register['PC'] = self.register[Rj]
 
         return BLX_func
