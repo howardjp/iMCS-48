@@ -4,6 +4,14 @@ from ._meta import _Meta
 
 class Logic(_Meta):
     def ANDS(self, params):
+        """
+        ANDS Ra, Ra, Rb
+
+        AND Ra and Rb together and store the result in Ra
+        The equivalent of `Ra = Ra & Rb`
+        Updates NZ flags
+        Ra and Rb must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rc))
@@ -17,6 +25,14 @@ class Logic(_Meta):
         return ANDS_func
 
     def BICS(self, params):
+        """
+        BICS Ra, Ra, Rb
+
+        Flip the bits in Rb and AND the result with Ra, storing the result in Ra
+        The equivalent of `Ra = Ra & ~Rb`
+        Updates NZ flags
+        Ra and Rb must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rc))
@@ -30,6 +46,14 @@ class Logic(_Meta):
         return BICS_func
 
     def EORS(self, params):
+        """
+        EORS Ra, Ra, Rb
+
+        Exclusive OR Ra and Rb together and store the result in Ra
+        The equivalent of `Ra = Ra ^ Rc`
+        Updates NZ flags
+        Ra and Rb must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
         self.check_arguments(low_registers=(Ra, Rc))
@@ -43,6 +67,14 @@ class Logic(_Meta):
         return EORS_func
 
     def ORRS(self, params):
+        """
+        ORRS Ra, Ra, Rb
+
+        OR Ra and Rb together and store the result in Ra
+        The equivalent of `Ra = Ra | Rc`
+        Updates NZ flags
+        Ra and Rb must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
 
         self.check_arguments(low_registers=(Ra, Rc))
@@ -56,6 +88,13 @@ class Logic(_Meta):
         return ORRS_func
 
     def TST(self, params):
+        """
+        TST Ra, Rb
+
+        AND Ra and Rb together and update the NZ flag. The result is not set
+        The equivalent of `Ra & Rc`
+        Ra and Rb must be low registers
+        """
         Ra, Rb = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb))

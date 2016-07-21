@@ -4,6 +4,15 @@ from ._meta import _Meta
 
 class Shift(_Meta):
     def ASRS(self, params):
+        """
+        ASRS Ra, Ra, Rc
+        ASRS Ra, Rb, #imm5_counting
+
+        Arithmetic shift right Rb by Rc or imm5_counting and store the result in Ra
+        imm5 counting is [1, 32]
+        In the register shift, the first two operands must be the same register
+        Ra, Rb, and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rc):
@@ -46,6 +55,15 @@ class Shift(_Meta):
         return ASRS_func
 
     def LSLS(self, params):
+        """
+        LSLS Ra, Ra, Rc
+        LSLS Ra, Rb, #imm5
+
+        Logical shift left Rb by Rc or imm5 and store the result in Ra
+        imm5 is [0, 31]
+        In the register shift, the first two operands must be the same register
+        Ra, Rb, and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rc):
@@ -80,6 +98,15 @@ class Shift(_Meta):
         return LSLS_func
 
     def LSRS(self, params):
+        """
+        LSRS Ra, Ra, Rc
+        LSRS Ra, Rb, #imm5_counting
+
+        Logical shift right Rb by Rc or imm5 and store the result in Ra
+        imm5 counting is [1, 32]
+        In the register shift, the first two operands must be the same register
+        Ra, Rb, and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rc):
@@ -114,6 +141,13 @@ class Shift(_Meta):
         return LSRS_func
 
     def RORS(self, params):
+        """
+        RORS Ra, Ra, Rc
+
+        Rotate shift right Rb by Rc or imm5 and store the result in Ra
+        The first two operands must be the same register
+        Ra and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         # TODO implement this function

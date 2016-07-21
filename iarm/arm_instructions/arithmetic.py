@@ -4,6 +4,12 @@ from ._meta import _Meta
 
 class Arithmetic(_Meta):
     def ADCS(self, params):
+        """
+        ADCS Ra, Rb, Rc
+
+        Add Rb and Rc + the carry bit and store the result in Ra
+        Ra, Rb, and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rc))
@@ -21,6 +27,14 @@ class Arithmetic(_Meta):
         return ADCS_func
 
     def ADD(self, params):
+        """
+        ADD Rx, Ry, [Rz, PC]
+        ADD Rx, [SP, PC], #imm10_4
+        ADD SP, SP, #imm9_4
+
+        Add Ry and Rz and store the result in Rx
+        Rx, Ry, and Rz can be any register
+        """
         Rx, Ry, Rz = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rz):
@@ -44,11 +58,20 @@ class Arithmetic(_Meta):
                     raise iarm.exceptions.RuleError("Second parameter {} is not SP or PC".format(Ry))
 
             def ADD_func():
+                # TODO use convert_to_int method
                 self.register[Rx] = self.register[Ry] + int(Rz[1:])
 
         return ADD_func
 
     def ADDS(self, params):
+        """
+        ADDS Ra, Rb, Rc
+        ADDS Ra, Rb, #imm3
+        ADDS Ra, Ra, #imm8
+
+        Add the result of the last two operands and store the result in the first operand.
+        Set the NZCV flags
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rc):
@@ -83,6 +106,13 @@ class Arithmetic(_Meta):
         return ADDS_func
 
     def CMN(self, params):
+        """
+        CMN Ra, Rb
+
+        Add the two registers and set the NZCV flags
+        The result is discarded
+        Ra and Rb must be low registers
+        """
         Ra, Rb = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb))
@@ -95,6 +125,13 @@ class Arithmetic(_Meta):
         return CMN_func
 
     def CMP(self, params):
+        """
+        CMP Rm, Rn
+        CMP Rm, #imm8
+
+        Subtract Rn or imm8 from Rm, set the NZCV flags, and discard the result
+        Rm and Rn can be R0-R14
+        """
         Rm, Rn = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rn):
@@ -115,6 +152,14 @@ class Arithmetic(_Meta):
         return CMP_func
 
     def MULS(self, params):
+        """
+        MULS Ra, Rb, Ra
+
+        Multiply Rb and Ra together and store the result in Ra.
+        Set the NZ flags.
+        Ra and Rb must be low registers
+        The first and last operand must be the same register
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb, Rc))
@@ -129,12 +174,24 @@ class Arithmetic(_Meta):
         return MULS_func
 
     def NOP(self, params):
+        """
+        NOP
+
+        Perform no operation
+        """
         # TODO check for no parameters
         def NOP_func():
             return
         return NOP_func
 
     def RSBS(self, params):
+        """
+        RSBS Ra, Rb, #0
+
+        Subtract Rb from zero (0 - Rb) and store the result in Ra
+        Set the NZCV flags
+        Ra and Rb must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb))
@@ -150,6 +207,13 @@ class Arithmetic(_Meta):
         return RSBS_func
 
     def SBCS(self, params):
+        """
+        SBCS Ra, Rb, Rc
+
+        Subtract Rc from Rb, and one more if the carry flag is set, and place the result in Ra
+        Set the NZCV flags
+        Ra, Rb, and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(low_registers=(Ra, Rb, Rc))
@@ -166,6 +230,11 @@ class Arithmetic(_Meta):
         return SBCS_func
 
     def SUB(self, params):
+        """
+        SUB SP, SP, #imm9_4
+
+        Subtract an immediate from the Stack Pointer
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         self.check_arguments(imm9_4=(Rc,))
@@ -181,6 +250,14 @@ class Arithmetic(_Meta):
         return SUB_func
 
     def SUBS(self, params):
+        """
+        SUBS Ra, Rb, Rc
+        SUBS Ra, Rb, #imm3
+        SUBS Ra, Ra, #imm8
+
+        Subtract Rc or an immediate from Rb and store the result in Ra
+        Ra, Rb, and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
 
         if self.is_register(Rc):

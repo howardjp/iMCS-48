@@ -3,6 +3,11 @@ from ._meta import _Meta
 
 class ConditionalBranch(_Meta):
     def BCC(self, params):
+        """
+        BCC label
+
+        Branch to the instruction at label if the C flag is not set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -15,6 +20,11 @@ class ConditionalBranch(_Meta):
         return BCC_func
 
     def BCS(self, params):
+        """
+        BCS label
+
+        Branch to the instruction at label if the C flag is set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -27,6 +37,11 @@ class ConditionalBranch(_Meta):
         return BCS_func
 
     def BEQ(self, params):
+        """
+        BEQ label
+
+        Branch to the instruction at label if the Z flag is set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -39,6 +54,11 @@ class ConditionalBranch(_Meta):
         return BEQ_func
 
     def BGE(self, params):
+        """
+        BGE label
+
+        Branch to the instruction at label if the N flag is the same as the V flag
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -51,6 +71,11 @@ class ConditionalBranch(_Meta):
         return BGE_func
 
     def BGT(self, params):
+        """
+        BGT label
+
+        Branch to the instruction at label if the N flag is the same as the V flag and the Z flag is not set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -63,6 +88,11 @@ class ConditionalBranch(_Meta):
         return BGT_func
 
     def BHI(self, params):
+        """
+        BHI label
+
+        Branch to the instruction at label if the C flag is set and the Z flag is not set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -75,6 +105,11 @@ class ConditionalBranch(_Meta):
         return BHI_func
 
     def BHS(self, params):
+        """
+        BHS label
+
+        Branch to the instruction at label if the C flag is set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -87,6 +122,11 @@ class ConditionalBranch(_Meta):
         return BHS_func
 
     def BLE(self, params):
+        """
+        BLE label
+
+        Branch to the instruction at label if the Z flag is set or if the N flag is not the same as the V flag
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -99,6 +139,11 @@ class ConditionalBranch(_Meta):
         return BLE_func
 
     def BLO(self, params):
+        """
+        BLO label
+
+        Branch to the instruction at label if the C flag is not set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -111,6 +156,11 @@ class ConditionalBranch(_Meta):
         return BLO_func
 
     def BLS(self, params):
+        """
+        BLS label
+
+        Branch to the instruction at label if the C flag is not set or the Z flag is set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -123,6 +173,11 @@ class ConditionalBranch(_Meta):
         return BLS_func
 
     def BLT(self, params):
+        """
+        BLT label
+
+        Branch to the instruction at label if the N flag is not the same as the V flag
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -135,6 +190,11 @@ class ConditionalBranch(_Meta):
         return BLT_func
 
     def BMI(self, params):
+        """
+        BMI label
+
+        Branch to the instruction at label if the N flag is set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -147,6 +207,11 @@ class ConditionalBranch(_Meta):
         return BMI_func
 
     def BNE(self, params):
+        """
+        BNE label
+
+        Branch to the instruction at label if the Z flag is not set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -159,6 +224,11 @@ class ConditionalBranch(_Meta):
         return BNE_func
 
     def BPL(self, params):
+        """
+        BPL label
+
+        Branch to the instruction at label if the N flag is set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -171,6 +241,11 @@ class ConditionalBranch(_Meta):
         return BPL_func
 
     def BVC(self, params):
+        """
+        BVC label
+
+        Branch to the instruction at label if the V flag is not set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))
@@ -183,6 +258,11 @@ class ConditionalBranch(_Meta):
         return BVC_func
 
     def BVS(self, params):
+        """
+        BVS label
+
+        Branch to the instruction at label if the V flag is set
+        """
         label = self.get_one_parameter(self.ONE_PARAMETER, params)
 
         self.check_arguments(label_exists=(label,))

@@ -34,6 +34,11 @@ class Directives(_Meta):
         warnings.warn("THUMB directive is not yet implemented")
 
     def directive_EQU(self, label, params):
+        """
+        label   EQU value
+
+        Set an equate. Equates are used as text replacement and will replace the label with the value set
+        """
         # TODO do a check on params
         # TODO figure out how to do equates
         # TODO can equates work on other things besides parameters (like instructions?)
@@ -56,6 +61,11 @@ class Directives(_Meta):
         warnings.warn("ENTRY directive is not yet implemented")
 
     def directive_SPACE(self, label, params):
+        """
+        label   SPACE num
+
+        Allocate space on the stack. `num` is the number of bytes to allocate
+        """
         # TODO allow equations
 
         params = params.strip()
@@ -71,10 +81,20 @@ class Directives(_Meta):
         self.space_pointer += self.convert_to_integer(params)
 
     def directive_END(self, label, params):
+        """
+            END
+
+        Signifies the end of a program, and no further actions should take place
+        """
         # TODO This should stick an end function into the program that always raises an error and raise a warning here
         raise iarm.exceptions.EndOfProgram("You have reached the end of the program")
 
     def directive_DCD(self, label, params):
+        """
+        label   DCD value[, value ...]
+
+        Allocate a word space in read only memory for the value or list of values
+        """
         # TODO make this read only
         # TODO check for param size
         # TODO can take any length comma separated values (VAL DCD 1, 0x2, 3, 4
@@ -98,6 +118,11 @@ class Directives(_Meta):
         self.space_pointer += 4
 
     def directive_DCH(self, label, params):
+        """
+        label   DCH value[, value ...]
+
+        Allocate a half word space in read only memory for the value or list of values
+        """
         # TODO make this read only
         # TODO check for word size
 
@@ -112,6 +137,11 @@ class Directives(_Meta):
         self.space_pointer += 2
 
     def directive_DCB(self, label, params):
+        """
+        label   DCB value[, value ...]
+
+        Allocate a byte space in read only memory for the value or list of values
+        """
         # TODO make this read only
         # TODO check for byte size
         self.labels[label] = self.space_pointer

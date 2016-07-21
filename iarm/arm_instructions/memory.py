@@ -6,6 +6,13 @@ class Memory(_Meta):
     THREE_PARAMETER_WITH_BRACKETS = r'\s*([^\s,]*),\s*\[([^\s,]*),\s*([^\s,]*)\](,\s*[^\s,]*)*\s*'
 
     def ADR(self, params):
+        """
+        ADR Ra, [PC, #imm10_4]
+        ADR Ra, label
+
+        Load the address of label or the PC offset into Ra
+        Ra must be a low register
+        """
         # TODO may need to rethink how I do PC, may need to be byte alligned
         # TODO This is wrong as each address is a word, not a byte. The filled value with its location (Do we want that, or the value at that location [Decompiled instruction])
         try:
@@ -31,7 +38,13 @@ class Memory(_Meta):
         return ADR_func
 
     def LDM(self, params):
+        """
+        LDM Ra!, {RLoList}
+
+        Load multiple with Ra not in RLoList
+        """
         # TODO what registers can be stored?
+        # TODO add the load multiple with Ra in RLoList
         Ra, RLoList = self.get_two_parameters(r'\s*([^\s,]*)!,\s*{(.*)}(.*)', params).split(',')
         RLoList = RLoList.split(',')
         RLoList = [i.strip() for i in RLoList]
@@ -48,6 +61,17 @@ class Memory(_Meta):
         return LDM_func
 
     def LDR(self, params):
+        """
+        LDR Ra, [PC, #imm10_4]
+        LDR Ra, label
+        LDR Ra, =equate
+        LDR Ra, [Rb, Rc]
+        LDR Ra, [Rb, #imm7_4]
+        LDR Ra, [SP, #imm10_4]
+
+        Load a word from memory into Ra
+        Ra, Rb, and Rc must be low registers
+        """
         # TODO definition for PC is Ra <- M[PC + Imm10_4], Imm10_4 = PC - label, need to figure this one out
         try:
             Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
@@ -142,6 +166,13 @@ class Memory(_Meta):
         return LDR_func
 
     def LDRB(self, params):
+        """
+        LDRB Ra, [Rb, Rc]
+        LDRB Ra, [Rb, #imm5]
+
+        Load a byte from memory into Ra
+        Ra, Rb, and Rc must be low registers
+        """
         try:
             Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
         except iarm.exceptions.ParsingError:
@@ -163,6 +194,13 @@ class Memory(_Meta):
         return LDRB_func
 
     def LDRH(self, params):
+        """
+        LDRH Ra, [Rb, Rc]
+        LDRH Ra, [Rb, #imm6_2]
+
+        Load a half word from memory into Ra
+        Ra, Rb, and Rc must be low registers
+        """
         try:
             Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
         except iarm.exceptions.ParsingError:
@@ -198,6 +236,12 @@ class Memory(_Meta):
         return LDRH_func
 
     def LDRSB(self, params):
+        """
+        LDRSB Ra, [Rb, Rc]
+
+        Load a byte from memory, sign extend, and put into Ra
+        Ra, Rb, and Rc must be low registers
+        """
         # TODO LDRSB cant use immediates
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
 
@@ -213,6 +257,12 @@ class Memory(_Meta):
         return LDRSB_func
 
     def LDRSH(self, params):
+        """
+        LDRSH Ra, [Rb, Rc]
+
+        Load a half word from memory, sign extend, and put into Ra
+        Ra, Rb, and Rc must be low registers
+        """
         # TODO LDRSH cant use immediates
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
 
@@ -233,10 +283,17 @@ class Memory(_Meta):
         return LDRSH_func
 
     def POP(self, params):
+        """
+        POP {RPopList}
+
+        Pop from the stack into the list of registers
+        List must contain only low registers or PC
+        """
         # TODO verify pop order
         # TODO pop list is comma separate, right?
-        # TODO what registeres are allowed to POP to?
+        # TODO what registeres are allowed to POP to? Low Registers and PC
         # TODO need to support ranges, ie {R2, R5-R7}
+        # TODO PUSH should reverse the list, not POP
         RPopList = self.get_one_parameter(r'\s*{(.*)}(.*)', params).split(',')
         RPopList.reverse()
         RPopList = [i.strip() for i in RPopList]
@@ -255,7 +312,14 @@ class Memory(_Meta):
         return POP_func
 
     def PUSH(self, params):
-        # TODO what registers are allowed to PUSH to?
+        """
+        PUSH {RPushList}
+
+        Push to the stack from a list of registers
+        List must contain only low registers or LR
+        """
+        # TODO what registers are allowed to PUSH to? Low registers and LR
+        # TODO PUSH should reverse the list, not POP
         RPushList = self.get_one_parameter(r'\s*{(.*)}(.*)', params).split(',')
         RPushList = [i.strip() for i in RPushList]
 
@@ -270,6 +334,11 @@ class Memory(_Meta):
         return PUSH_func
 
     def STM(self, params):
+        """
+        STM Ra!, {RLoList}
+
+        Store multiple registers into memory
+        """
         # TODO what registers can be stored?
         Ra, RLoList = self.get_two_parameters(r'\s*([^\s,]*)!,\s*{(.*)}(.*)', params).split(',')
         RLoList = RLoList.split(',')
@@ -286,6 +355,14 @@ class Memory(_Meta):
         return STM_func
 
     def STR(self, params):
+        """
+        STR Ra, [Rb, Rc]
+        STR Ra, [Rb, #imm7_4]
+        STR Ra, [SP, #imm10_4]
+
+        Store Ra into memory as a word
+        Ra, Rb, and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
 
         if self.is_immediate(Rc):
@@ -307,6 +384,13 @@ class Memory(_Meta):
         return STR_func
 
     def STRB(self, params):
+        """
+        STRB Ra, [Rb, Rc]
+        STRB Ra, [Rb, #imm5]
+
+        Store Ra into memory as a byte
+        Ra, Rb, and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
 
         if self.is_immediate(Rc):
@@ -323,6 +407,13 @@ class Memory(_Meta):
         return STRB_func
 
     def STRH(self, params):
+        """
+        STRH Ra, [Rb, Rc]
+        STRH Ra, [Rb, #imm6_2]
+
+        Store Ra into memory as a half word
+        Ra, Rb, and Rc must be low registers
+        """
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
 
         if self.is_immediate(Rc):
