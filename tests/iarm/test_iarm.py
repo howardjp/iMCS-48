@@ -13,7 +13,7 @@ class TestArm(unittest.TestCase):
 class TestArmChecks(TestArm):
     def test_is_register(self):
         self.assertTrue(self.interp.is_register('R0'))
-        self.assertTrue(self.interp.is_register('R0xF'))
+        #self.assertTrue(self.interp.is_register('R0xF')) Cannot use hex or binary for register access
         self.assertFalse(self.interp.is_register('#0'))
         self.assertFalse(self.interp.is_register('#0x1'))
 

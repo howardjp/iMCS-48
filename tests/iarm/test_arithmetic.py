@@ -45,7 +45,7 @@ class TestArmArithmetic(TestArm):
         self.interp.evaluate(" ADD R0, PC, #4")  # Need a second instruction because PC == 1
         self.interp.run()
 
-        self.assertEqual(self.interp.register['R0'], 5)
+        self.assertEqual(self.interp.register['R0'], 6)
 
     def test_ADD_SP(self):
         self.interp.register['SP'] = 1

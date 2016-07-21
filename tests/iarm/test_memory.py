@@ -4,6 +4,7 @@ import unittest
 
 
 class TestArmMemory(TestArm):
+    @unittest.skip("ADR not yet implemented")
     def test_ADR(self):
         self.interp.labels['TextMessage'] = 1
 
@@ -12,7 +13,7 @@ class TestArmMemory(TestArm):
 
         self.assertEqual(self.interp.register['R1'], 1)
 
-        self.interp.evaluate(" ADR R3, [PC, #996")
+        self.interp.evaluate(" ADR R3, [PC, #996]")
         self.interp.run()
 
         self.assertEqual(self.interp.register['R3'], 1000)
