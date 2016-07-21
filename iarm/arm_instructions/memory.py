@@ -95,6 +95,8 @@ class Memory(_Meta):
                     except ValueError:
                         raise iarm.exceptions.IarmError("'{}' is not a label, equate, or parsable integer".format(label))
 
+                # TODO this crashes if SPACE has not been hit yet.
+                # TODO find a way to defer this if it is not yet available
                 if int(label) % 4 != 0:
                     raise iarm.exceptions.IarmError("Memory access not word aligned; Immediate: {}".format(int(label)))
             elif label.startswith('[') and label.endswith(']'):
