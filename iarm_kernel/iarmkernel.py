@@ -282,7 +282,8 @@ class ArmKernel(Kernel):
             stream_content = {'name': 'stderr', 'text': "'{}' not a known magic or instruction".format(line)}
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
-    # TODO add support for access to the generate random and postpone execution vars
+    # TODO add tab completion
+    # TODO add completeness (can be used to return the prompt back to the user in case of an error)
 
     def run_magic(self, line):
         # TODO allow magics at end of code block
