@@ -27,7 +27,9 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
         # Validate the code and get back a function to execute that instruction
         program = []
         labels = {}
+        line_counter = 0
         for line in parsed:
+            line_counter += 1  # TODO this doesnt seem to include lines with new lines
             if not any(line):
                 continue  # We have a blank line
             label, op, params = line
@@ -50,7 +52,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                     continue
                 except Exception as e:
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
-                    e.args = ("Error on '{}': ".format(label + ' ' + op + ' ' + params),) + e.args
+                    e.args = ("Line {}; Error on '{}': ".format(line_counter, label + ' ' + op + ' ' + params),) + e.args
                     raise
 
             # Next,
@@ -60,7 +62,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                     func = self.ops[op]
                 except KeyError as e:
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
-                    raise iarm.exceptions.ValidationError("Error on '{}': Instruction '{}' does not exist".format(label + ' ' + op + ' ' + params, op))
+                    raise iarm.exceptions.ValidationError("Line {}; Error on '{}': Instruction '{}' does not exist".format(line_counter, label + ' ' + op + ' ' + params, op))
 
                 # Run the instruction, if it raised an error, roll back the labels
                 try:
@@ -68,7 +70,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                 except Exception as e:
                     # TODO We may have a key error, or something other than an IarmError
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
-                    e.args = ("Error on '{}': ".format(label + ' ' + op + ' ' + params),) + e.args
+                    e.args = ("Line {}; Error on '{}': ".format(line_counter, label + ' ' + op + ' ' + params),) + e.args
                     raise
 
                 program.append(instruction)  # It validated, add it to the temp instruction list
