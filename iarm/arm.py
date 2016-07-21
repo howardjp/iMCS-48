@@ -2,6 +2,7 @@
 
 import iarm.exceptions
 import iarm.arm_instructions as instructions
+import warnings
 
 
 class Arm(instructions.DataMovement, instructions.Arithmetic,
@@ -50,6 +51,9 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                     self.directives[op](label, params)  # Directives are run immediately
                     labels.update(self.labels)  # TODO find better way to keep these up to date so they are not over written by the `self.labels.update(labels)` step
                     continue
+                except iarm.exceptions.EndOfProgram as e:
+                    warnings.warn(str(e))
+                    continue
                 except Exception as e:
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
                     e.args = ("Line {}; Error on '{}': ".format(line_counter, label + ' ' + op + ' ' + params),) + e.args
@@ -72,8 +76,8 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
                     [self.labels.pop(i, None) for i in temp_labels]  # Clean up the added labels
                     e.args = ("Line {}; Error on '{}': ".format(line_counter, label + ' ' + op + ' ' + params),) + e.args
                     raise
-
-                program.append(instruction)  # It validated, add it to the temp instruction list
+                else:
+                    program.append(instruction)  # It validated, add it to the temp instruction list
 
         # Code block was successfully validated, update the main program
         self.program += program
