@@ -33,7 +33,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         remove_comments = re.compile(r'^([^;\n]*);?.*$', re.MULTILINE)
         code = '\n'.join(remove_comments.findall(code))  # TODO can probably do this better
         # TODO labels with spaces between pipes is allowed `|label with space| INST OPER`
-        parser = re.compile(r'^(\w*)?[ \t\r\f\v]*(\S+)[ \t\r\f\v]*(.*)$', re.MULTILINE)
+        parser = re.compile(r'^(\w*)?[ \t\r\f\v]*(\S*)[ \t\r\f\v]*(.*)$', re.MULTILINE)
         return parser.findall(code)
 
     def is_register(self, R):
