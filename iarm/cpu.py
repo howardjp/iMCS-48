@@ -82,6 +82,11 @@ class RegisterCpu(object):
     def postpone_execution(self):
         return self._postpone_execution
 
+    @postpone_execution.setter
+    def postpone_execution(self, value):
+        self._postpone_execution = value
+
+
 
 class RandomValueDict(dict):
     """
