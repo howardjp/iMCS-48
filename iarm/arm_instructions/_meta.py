@@ -254,7 +254,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         :return:
         """
         Rx, other = self.get_parameters(regex_exp, parameters)
-        if other is not None and not other.strip():
+        if other is not None and other.strip():
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         return Rx
 
@@ -268,7 +268,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         :return:
         """
         Rx, Ry, other = self.get_parameters(regex_exp, parameters)
-        if other is not None and not other.strip():
+        if other is not None and other.strip():
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         if Rx and Ry:
             return Rx, Ry
@@ -287,7 +287,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         :return:
         """
         Rx, Ry, Rz, other = self.get_parameters(regex_exp, parameters)
-        if other is not None and not other.strip():
+        if other is not None and other.strip():
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         return Rx, Ry, Rz
 
