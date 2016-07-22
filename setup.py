@@ -18,6 +18,8 @@ setup(name=iarm.__title__,
       license='MIT',
       packages=find_packages('.'),
       install_requires=[
-          'jupyter'
+            'ipykernel',
+            'jupyter-client',
+            'ipython',
       ],
       zip_safe=True)
