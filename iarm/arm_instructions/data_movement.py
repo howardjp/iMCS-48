@@ -38,8 +38,7 @@ class DataMovement(_Meta):
             self.check_arguments(low_registers=[Ra], imm8=[Rb])
 
             def MOVS_func():
-                # TODO use convert_to_int method
-                self.register[Ra] = int(Rb[1:])
+                self.register[Ra] = self.convert_to_integer(Rb[1:])
 
                 # Set N and Z status flags
                 self.set_NZ_flags(self.register[Ra])
