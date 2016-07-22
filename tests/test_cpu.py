@@ -58,3 +58,6 @@ class TestRandomValueDict(unittest.TestCase):
         self.assertEqual(self.register['a'], 255)
         self.register['a'] += 1
         self.assertEqual(self.register['a'], 0)
+
+if __name__ == '__main__':
+    unittest.main()
