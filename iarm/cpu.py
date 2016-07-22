@@ -6,7 +6,7 @@ class RegisterCpu(object):
     """
     A register based CPU
     """
-    def __init__(self, bit_width, max_registers, memory_width, memory_size, generate_random=False, postpone_execution=True):
+    def __init__(self, bit_width, max_registers, memory_width=8, memory_size=1024, generate_random=False, postpone_execution=True):
         """
         Initialize the CPU and get all instructions and "rules"
 

@@ -108,4 +108,4 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
 
 
 if __name__ == '__main__':
-    interp = Arm(1024, False, False)
+    interp = Arm(generate_random=False, postpone_execution=False)
