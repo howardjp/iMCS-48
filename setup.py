@@ -1,8 +1,17 @@
 from setuptools import setup, find_packages
+import iarm
 
-setup(name="iarm",
-      version="0.1",
-      description="A Jupyter kernel for the ARM instruction set",
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+    long_description.replace('\r', '')  # PyPi doesnt like '\r\n', only '\n'
+except:
+    long_description = open('README.md').read()
+
+setup(name=iarm.__title__,
+      version=iarm.__version__,
+      description="An interpreter for the ARM instruction set and an accompanying Jupyter kernel",
+      long_description=long_description,
       url="https://github.com/DeepHorizons/iarm",
       author="Joshua Milas",
       author_email="josh.milas@gmail.com",

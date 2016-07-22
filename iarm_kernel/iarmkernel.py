@@ -7,9 +7,9 @@ import iarm.exceptions
 
 class ArmKernel(Kernel):
     implementation = 'IArm'
-    implementation_version = '0.1'
+    implementation_version = '0.1.0'
     language = 'ARM'
-    language_version = '0.1'
+    language_version = iarm.__version__
     language_info = {
         'name': 'ARM Coretex M0+ Thumb Assembly',
         'mimetype': 'text/x-asm',
