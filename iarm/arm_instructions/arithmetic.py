@@ -58,8 +58,7 @@ class Arithmetic(_Meta):
                     raise iarm.exceptions.RuleError("Second parameter {} is not SP or PC".format(Ry))
 
             def ADD_func():
-                # TODO use convert_to_int method
-                self.register[Rx] = self.register[Ry] + int(Rz[1:])
+                self.register[Rx] = self.register[Ry] + self.convert_to_integer(Rz[1:])
 
         return ADD_func
 
