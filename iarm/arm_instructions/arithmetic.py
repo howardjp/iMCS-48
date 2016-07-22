@@ -89,8 +89,8 @@ class Arithmetic(_Meta):
 
             def ADDS_func():
                 oper_1 = self.register[Ra]
-                oper_2 = int(Rc[1:])
-                self.register[Ra] = self.register[Ra] + int(Rc[1:])
+                oper_2 = self.convert_to_integer(Rc[1:])
+                self.register[Ra] = self.register[Ra] + oper_2
                 self.set_NZCV_flags(oper_1, oper_2, self.register[Ra], 'add')
         else:
             # ADDS Ra, Rb, #imm3
@@ -98,8 +98,8 @@ class Arithmetic(_Meta):
 
             def ADDS_func():
                 oper_1 = self.register[Rb]
-                oper_2 = int(Rc[1:])
-                self.register[Ra] = self.register[Rb] + int(Rc[1:])
+                oper_2 = self.convert_to_integer(Rc[1:])
+                self.register[Ra] = self.register[Rb] + oper_2
                 self.set_NZCV_flags(oper_1, oper_2, self.register[Ra], 'add')
 
         return ADDS_func
@@ -145,8 +145,9 @@ class Arithmetic(_Meta):
             self.check_arguments(R0_thru_R14=(Rm,), imm8=(Rn,))
 
             def CMP_func():
-                self.set_NZCV_flags(self.register[Rm], int(Rn[1:]),
-                                    self.register[Rm] - int(Rn[1:]), 'sub')
+                tmp = self.convert_to_integer(Rn[1:])
+                self.set_NZCV_flags(self.register[Rm], tmp,
+                                    self.register[Rm] - tmp, 'sub')
 
         return CMP_func
 
@@ -244,7 +245,7 @@ class Arithmetic(_Meta):
 
         # SUB SP, SP, #imm9_4
         def SUB_func():
-            self.register[Ra] = self.register[Rb] - int(Rc[1:])
+            self.register[Ra] = self.register[Rb] - self.convert_to_integer(Rc[1:])
 
         return SUB_func
 
@@ -275,15 +276,15 @@ class Arithmetic(_Meta):
 
                 def SUBS_func():
                     oper_1 = self.register[Ra]
-                    self.register[Ra] = self.register[Ra] - int(Rc[1:])
-                    self.set_NZCV_flags(oper_1, int(Rc[1:]), self.register[Ra], 'sub')
+                    self.register[Ra] = self.register[Ra] - self.convert_to_integer(Rc[1:])
+                    self.set_NZCV_flags(oper_1, self.convert_to_integer(Rc[1:]), self.register[Ra], 'sub')
             else:
                 # SUBS Ra, Rb, #imm3
                 self.check_arguments(low_registers=(Ra, Rb), imm3=(Rc,))
 
                 def SUBS_func():
                     oper_1 = self.register[Rb]
-                    self.register[Ra] = self.register[Rb] - int(Rc[1:])
-                    self.set_NZCV_flags(oper_1, int(Rc[1:]), self.register[Ra], 'sub')
+                    self.register[Ra] = self.register[Rb] - self.convert_to_integer(Rc[1:])
+                    self.set_NZCV_flags(oper_1, self.convert_to_integer(Rc[1:]), self.register[Ra], 'sub')
 
         return SUBS_func

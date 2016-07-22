@@ -111,7 +111,8 @@ class Memory(_Meta):
                     if self.memory[Rb] % 4 != 0:
                         raise iarm.exceptions.HardFault(
                             "Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb],
-                                                                                         int(Rc[1:])))
+                                                                                                 self.convert_to_integer(
+                                                                                                     Rc[1:])))
                     self.register[Ra] = 0
                     for i in range(4):
                         self.register[Ra] |= (self.memory[self.register[Rb] + i] << (8 * i))
@@ -147,11 +148,11 @@ class Memory(_Meta):
 
             def LDR_func():
                 # TODO does memory read up?
-                if (self.register[Rb] + int(Rc[1:])) % 4 != 0:
-                    raise iarm.exceptions.HardFault("Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb], int(Rc[1:])))
+                if (self.register[Rb] + self.convert_to_integer(Rc[1:])) % 4 != 0:
+                    raise iarm.exceptions.HardFault("Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb], self.convert_to_integer(Rc[1:])))
                 self.register[Ra] = 0
                 for i in range(4):
-                    self.register[Ra] |= (self.memory[self.register[Rb] + int(Rc[1:]) + i] << (8 * i))
+                    self.register[Ra] |= (self.memory[self.register[Rb] + self.convert_to_integer(Rc[1:]) + i] << (8 * i))
         else:
             self.check_arguments(low_registers=(Ra, Rb, Rc))
 
@@ -160,7 +161,8 @@ class Memory(_Meta):
                 if (self.register[Rb] + self.register[Rc]) % 4 != 0:
                     raise iarm.exceptions.HardFault(
                         "Memory access not word aligned; Register: {}  Immediate: {}".format(self.register[Rb],
-                                                                                             int(Rc[1:])))
+                                                                                             self.convert_to_integer(
+                                                                                                 Rc[1:])))
                 self.register[Ra] = 0
                 for i in range(4):
                     self.register[Ra] |= (self.memory[self.register[Rb] + self.register[Rc] + i] << (8 * i))
@@ -186,7 +188,7 @@ class Memory(_Meta):
             self.check_arguments(low_registers=(Ra, Rb), imm5=(Rc,))
 
             def LDRB_func():
-                self.register[Ra] = self.memory[self.register[Rb] + int(Rc[1:])]
+                self.register[Ra] = self.memory[self.register[Rb] + self.convert_to_integer(Rc[1:])]
         else:
             self.check_arguments(low_registers=(Ra, Rb, Rc))
 
@@ -218,10 +220,11 @@ class Memory(_Meta):
                 if (self.register[Rb]) % 2 != 0:
                     raise iarm.exceptions.HardFault(
                         "Memory access not half word aligned; Register: {}  Immediate: {}".format(self.register[Rb],
-                                                                                             int(Rc[1:])))
+                                                                                                  self.convert_to_integer(
+                                                                                                      Rc[1:])))
                 self.register[Ra] = 0
                 for i in range(2):
-                    self.register[Ra] |= (self.memory[self.register[Rb] + int(Rc[1:]) + i] << (8 * i))
+                    self.register[Ra] |= (self.memory[self.register[Rb] + self.convert_to_integer(Rc[1:]) + i] << (8 * i))
         else:
             self.check_arguments(low_registers=(Ra, Rb, Rc))
 
@@ -375,7 +378,7 @@ class Memory(_Meta):
 
             def STR_func():
                 for i in range(4):
-                    self.memory[self.register[Rb] + int(Rc[1:]) + i] = ((self.register[Ra] >> (8 * i)) & 0xFF)
+                    self.memory[self.register[Rb] + self.convert_to_integer(Rc[1:]) + i] = ((self.register[Ra] >> (8 * i)) & 0xFF)
         else:
             self.check_arguments(low_registers=(Ra, Rb, Rc))
 
@@ -399,7 +402,7 @@ class Memory(_Meta):
             self.check_arguments(low_registers=(Ra, Rb), imm5=(Rc,))
 
             def STRB_func():
-                self.memory[self.register[Rb] + int(Rc[1:])] = (self.register[Ra] & 0xFF)
+                self.memory[self.register[Rb] + self.convert_to_integer(Rc[1:])] = (self.register[Ra] & 0xFF)
         else:
             self.check_arguments(low_registers=(Ra, Rb, Rc))
 
@@ -423,7 +426,7 @@ class Memory(_Meta):
 
             def STRH_func():
                 for i in range(2):
-                    self.memory[self.register[Rb] + int(Rc[1:]) + i] = ((self.register[Ra] >> (8 * i)) & 0xFF)
+                    self.memory[self.register[Rb] + self.convert_to_integer(Rc[1:]) + i] = ((self.register[Ra] >> (8 * i)) & 0xFF)
         else:
             self.check_arguments(low_registers=(Ra, Rb, Rc))
 
