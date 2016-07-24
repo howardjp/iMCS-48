@@ -5,7 +5,8 @@ IArm is an ARM interpreter for the ARMv6 THUMB instruction set
 (More specifically for the ARM Cortex M0+ CPU).
 It supports almost 100% of the instructions,
 and some assembler directives.
-There is also its [Jupyter](http://jupyter.org/) kernel counterpart so it can be
+There is also its [Jupyter](http://jupyter.org/)
+kernel counterpart so it can be
 used with Jupyter notebooks.
 Check out the `/docs` folder to see a technical overview
 and some example notebooks.
@@ -14,6 +15,8 @@ and some example notebooks.
 
 Install
 -------
+IArm is a Python 3 only application.
+Use the Py3 versions as needed (`pip3` and `python3`).
 
 Install with pip
 ```
@@ -35,7 +38,8 @@ Usage
 -----
 
 ### Python
-Import the `arm` module and instantiate an interpreter from the `Arm` class
+Import the `arm` module
+and instantiate an interpreter from the `Arm` class
 ```
 import iarm.arm
 interp = iarm.arm.Arm()
