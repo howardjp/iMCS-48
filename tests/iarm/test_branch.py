@@ -1,4 +1,4 @@
-from test_iarm import TestArm
+from .test_iarm import TestArm
 import iarm.exceptions
 import unittest
 
