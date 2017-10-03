@@ -290,5 +290,30 @@ class TestArmMemory(TestArm):
     def test_STRH(self):
         pass
 
+    def test_LDR_SPACE(self):
+        # A regression test
+        self.interp.evaluate("""
+ LDR R1, =P
+ LDR R2, =R
+P SPACE 4
+R SPACE 4
+""")
+        self.interp.run()
+        self.assertEqual(self.interp.register["R1"], 0)
+        self.assertEqual(self.interp.register["R2"], 4)
+
+    def test_LDR_SPACE_separate_blocks(self):
+        # A regression test
+        self.interp.evaluate("""
+ LDR R1, =P
+ LDR R2, =R""")
+        self.interp.evaluate("""
+P SPACE 4
+R SPACE 4
+""")
+        self.interp.run()
+        self.assertEqual(self.interp.register["R1"], 0)
+        self.assertEqual(self.interp.register["R2"], 4)
+
 if __name__ == '__main__':
     unittest.main()
