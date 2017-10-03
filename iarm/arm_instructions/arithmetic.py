@@ -5,12 +5,20 @@ from ._meta import _Meta
 class Arithmetic(_Meta):
     def ADCS(self, params):
         """
-        ADCS Ra, Rb, Rc
+        ADCS [Ra,] Rb, Rc
 
         Add Rb and Rc + the carry bit and store the result in Ra
         Ra, Rb, and Rc must be low registers
+        if Ra is omitted, then it is assumed to be Rb
         """
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         self.check_arguments(low_registers=(Ra, Rc))
         self.match_first_two_parameters(Ra, Rb)
@@ -28,14 +36,23 @@ class Arithmetic(_Meta):
 
     def ADD(self, params):
         """
-        ADD Rx, Ry, [Rz, PC]
-        ADD Rx, [SP, PC], #imm10_4
-        ADD SP, SP, #imm9_4
+        ADD [Rx,] Ry, [Rz, PC]
+        ADD [Rx,] [SP, PC], #imm10_4
+        ADD [SP,] SP, #imm9_4
 
         Add Ry and Rz and store the result in Rx
         Rx, Ry, and Rz can be any register
+        If Rx is omitted, then it is assumed to be Ry
         """
-        Rx, Ry, Rz = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        # TODO can we have ADD SP, #imm9_4?
+        try:
+            Rx, Ry, Rz = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Ry, Rz = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Rx = Ry
 
         if self.is_register(Rz):
             # ADD Rx, Ry, Rz
@@ -64,14 +81,22 @@ class Arithmetic(_Meta):
 
     def ADDS(self, params):
         """
-        ADDS Ra, Rb, Rc
+        ADDS [Ra,] Rb, Rc
         ADDS Ra, Rb, #imm3
-        ADDS Ra, Ra, #imm8
+        ADDS [Ra,] Ra, #imm8
 
         Add the result of the last two operands and store the result in the first operand.
         Set the NZCV flags
+        if Ra is omitted, then it is assumed to be Rb
         """
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         if self.is_register(Rc):
             # ADDS Ra, Rb, Rc
@@ -186,13 +211,21 @@ class Arithmetic(_Meta):
 
     def RSBS(self, params):
         """
-        RSBS Ra, Rb, #0
+        RSBS [Ra,] Rb, #0
 
         Subtract Rb from zero (0 - Rb) and store the result in Ra
         Set the NZCV flags
         Ra and Rb must be low registers
+        if Ra is omitted, then it is assumed to be Rb
         """
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         self.check_arguments(low_registers=(Ra, Rb))
         if Rc != '#0':
@@ -208,13 +241,21 @@ class Arithmetic(_Meta):
 
     def SBCS(self, params):
         """
-        SBCS Ra, Rb, Rc
+        SBCS [Ra,] Ra, Rc
 
         Subtract Rc from Rb, and one more if the carry flag is set, and place the result in Ra
         Set the NZCV flags
         Ra, Rb, and Rc must be low registers
+        The first Ra is optional
         """
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         self.check_arguments(low_registers=(Ra, Rb, Rc))
         self.match_first_two_parameters(Ra, Rb)
@@ -231,11 +272,19 @@ class Arithmetic(_Meta):
 
     def SUB(self, params):
         """
-        SUB SP, SP, #imm9_4
+        SUB [SP,] SP, #imm9_4
 
         Subtract an immediate from the Stack Pointer
+        The first SP is optional
         """
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         self.check_arguments(imm9_4=(Rc,))
         if Ra != 'SP':
@@ -251,14 +300,22 @@ class Arithmetic(_Meta):
 
     def SUBS(self, params):
         """
-        SUBS Ra, Rb, Rc
-        SUBS Ra, Rb, #imm3
-        SUBS Ra, Ra, #imm8
+        SUBS [Ra,] Rb, Rc
+        SUBS [Ra,] Rb, #imm3
+        SUBS [Ra,] Ra, #imm8
 
         Subtract Rc or an immediate from Rb and store the result in Ra
         Ra, Rb, and Rc must be low registers
+        If Ra is omitted, then it is assumed to be Rb
         """
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         if self.is_register(Rc):
             # SUBS Ra, Rb, Rc

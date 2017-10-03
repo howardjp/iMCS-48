@@ -22,11 +22,31 @@ class TestArmArithmetic(TestArm):
         with self.assertRaises(iarm.exceptions.RuleError):
             self.interp.evaluate(" ADCS R0, R1, R2")
 
+    def test_ADCS_no_destination_register(self):
+        self.interp.register['R0'] = 1
+        self.interp.register['R2'] = 3
+
+        self.interp.evaluate(" ADCS R0, R2")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 4)
+        # TODO check for status registers
+        # TODO check for carry bit
+
     def test_ADD(self):
         self.interp.register['R0'] = 1
         self.interp.register['R2'] = 3
 
         self.interp.evaluate(" ADD R0, R0, R2")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R0'], 4)
+
+    def test_ADD_no_destination_register(self):
+        self.interp.register['R0'] = 1
+        self.interp.register['R2'] = 3
+
+        self.interp.evaluate(" ADD R0, R2")
         self.interp.run()
 
         self.assertEqual(self.interp.register['R0'], 4)
@@ -64,6 +84,18 @@ class TestArmArithmetic(TestArm):
         self.interp.run()
 
         self.assertEqual(self.interp.register['R0'], 5)
+        # TODO test flags
+        # TODO test overflow
+
+    def test_ADDS_no_destination_register(self):
+        self.interp.register['R0'] = 1
+        self.interp.register['R1'] = 2
+        self.interp.register['R2'] = 3
+
+        self.interp.evaluate(" ADDS R1, R2")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R1'], 5)
         # TODO test flags
         # TODO test overflow
 
@@ -142,6 +174,15 @@ class TestArmArithmetic(TestArm):
         with self.assertRaises(iarm.exceptions.IarmError):
             self.interp.evaluate(" RSBS, R3, R4, #1")
 
+    def test_RSBS_no_destination_register(self):
+        self.interp.register['R1'] = 10
+
+        self.interp.evaluate(" RSBS R1, #0")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R1'], -10 & 0xFFFFFFFF)
+        # TODO test flags
+
     def test_SBCS(self):
         self.interp.register['R0'] = 10
         self.interp.register['R1'] = 3
@@ -163,6 +204,15 @@ class TestArmArithmetic(TestArm):
 
         # TODO test flags
 
+    def test_SBCS_no_destination_register(self):
+        self.interp.register['R0'] = 10
+        self.interp.register['R1'] = 3
+
+        self.interp.evaluate(" SBCS R0, R1")
+        self.interp.run()
+        self.assertEqual(self.interp.register['R0'], 7)
+        # TODO test flags
+
     def test_SUB(self):
         self.interp.register['SP'] = 8
 
@@ -176,6 +226,14 @@ class TestArmArithmetic(TestArm):
 
         with self.assertRaises(iarm.exceptions.IarmError):
             self.interp.evaluate(" SUB SP, SP, #3")
+
+    def test_SUB_no_destination_register(self):
+        self.interp.register['SP'] = 8
+
+        self.interp.evaluate(" SUB SP, #4")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['SP'], 4)
 
     def test_SUBS(self):
         self.interp.register['R4'] = 3
@@ -203,6 +261,15 @@ class TestArmArithmetic(TestArm):
             self.interp.evaluate(" SUBS R3, R3, #256")
 
         # TODO check flags
+
+    def test_SUBS_no_destination_register(self):
+        self.interp.register['R4'] = 3
+        self.interp.register['R5'] = 2
+
+        self.interp.evaluate(" SUBS R4, R5")
+        self.interp.run()
+
+        self.assertEqual(self.interp.register['R4'], 1)
 
 
 if __name__ == '__main__':

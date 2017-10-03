@@ -3,6 +3,7 @@ import iarm.exceptions
 import unittest
 
 
+# TODO make sure to also test no destination registers
 class TestArmLogic(TestArm):
     @unittest.skip('No Test Defined')
     def test_ANDS(self):

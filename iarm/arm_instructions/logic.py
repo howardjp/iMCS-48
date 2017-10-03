@@ -5,14 +5,22 @@ from ._meta import _Meta
 class Logic(_Meta):
     def ANDS(self, params):
         """
-        ANDS Ra, Ra, Rb
+        ANDS [Ra,] Ra, Rb
 
         AND Ra and Rb together and store the result in Ra
         The equivalent of `Ra = Ra & Rb`
         Updates NZ flags
         Ra and Rb must be low registers
+        The first register is optional
         """
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         self.check_arguments(low_registers=(Ra, Rc))
         self.match_first_two_parameters(Ra, Rb)
@@ -26,14 +34,22 @@ class Logic(_Meta):
 
     def BICS(self, params):
         """
-        BICS Ra, Ra, Rb
+        BICS [Ra,] Ra, Rb
 
         Flip the bits in Rb and AND the result with Ra, storing the result in Ra
         The equivalent of `Ra = Ra & ~Rb`
         Updates NZ flags
         Ra and Rb must be low registers
+        The first register is optional
         """
-        Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         self.check_arguments(low_registers=(Ra, Rc))
         self.match_first_two_parameters(Ra, Rb)
@@ -47,14 +63,22 @@ class Logic(_Meta):
 
     def EORS(self, params):
         """
-        EORS Ra, Ra, Rb
+        EORS [Ra,] Ra, Rb
 
         Exclusive OR Ra and Rb together and store the result in Ra
         The equivalent of `Ra = Ra ^ Rc`
         Updates NZ flags
         Ra and Rb must be low registers
+        The first register is optional
         """
-        Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         self.check_arguments(low_registers=(Ra, Rc))
         self.match_first_two_parameters(Ra, Rb)
@@ -68,14 +92,22 @@ class Logic(_Meta):
 
     def ORRS(self, params):
         """
-        ORRS Ra, Ra, Rb
+        ORRS [Ra,] Ra, Rb
 
         OR Ra and Rb together and store the result in Ra
         The equivalent of `Ra = Ra | Rc`
         Updates NZ flags
         Ra and Rb must be low registers
+        The first register is optional
         """
-        Ra, Rb, Rc = self.get_three_parameters(r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*', params)
+        # This instruction allows for an optional destination register
+        # If it is omitted, then it is assumed to be Rb
+        # As defined in http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0662b/index.html
+        try:
+            Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_COMMA_SEPARATED, params)
+        except iarm.exceptions.ParsingError:
+            Rb, Rc = self.get_two_parameters(self.TWO_PARAMETER_COMMA_SEPARATED, params)
+            Ra = Rb
 
         self.check_arguments(low_registers=(Ra, Rc))
         self.match_first_two_parameters(Ra, Rb)
