@@ -9,7 +9,7 @@ class _Meta(iarm.cpu.RegisterCpu):
     Give helper functions to the instructions
     """
     REGISTER_NUMBER = r'(\d+)'
-    IMMEDIATE_NUMBER = r'(0[xX][0-9a-zA-Z]+|2_\d+|\d+)'
+    IMMEDIATE_NUMBER = r'(0[xX][0-9a-zA-Z]+|2_\d+|-?\d+)'
     REGISTER_REGEX = r'^[rR]({})|fp|sp|lr|LR|SP|FP$'.format(REGISTER_NUMBER)
     IMMEDIATE_REGEX = r'^#{}$'.format(IMMEDIATE_NUMBER)
     ONE_PARAMETER = r'\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
