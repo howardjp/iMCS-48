@@ -268,7 +268,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         Rx, other = self.get_parameters(regex_exp, parameters)
         if other is not None and other.strip():
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
-        return Rx
+        return Rx.upper()
 
     def get_two_parameters(self, regex_exp, parameters):
         """
@@ -283,7 +283,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         if other is not None and other.strip():
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
         if Rx and Ry:
-            return Rx, Ry
+            return Rx.upper(), Ry.upper()
         elif not Rx:
             raise iarm.exceptions.ParsingError("Missing first positional argument")
         else:
@@ -301,7 +301,7 @@ class _Meta(iarm.cpu.RegisterCpu):
         Rx, Ry, Rz, other = self.get_parameters(regex_exp, parameters)
         if other is not None and other.strip():
             raise iarm.exceptions.ParsingError("Extra arguments found: {}".format(other))
-        return Rx, Ry, Rz
+        return Rx.upper(), Ry.upper(), Rz.upper()
 
     def set_APSR_flag_to_value(self, flag, value):
         """
