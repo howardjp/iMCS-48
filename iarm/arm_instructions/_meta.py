@@ -9,8 +9,8 @@ class _Meta(iarm.cpu.RegisterCpu):
     Give helper functions to the instructions
     """
     REGISTER_NUMBER = r'(\d+)'
-    REGISTER_REGEX = r'^R{}$'.format(REGISTER_NUMBER)
     IMMEDIATE_NUMBER = r'(0[xX][0-9a-zA-Z]+|2_\d+|\d+)'
+    REGISTER_REGEX = r'^[rR]({})|fp|sp|lr|LR|SP|FP$'.format(REGISTER_NUMBER)
     IMMEDIATE_REGEX = r'^#{}$'.format(IMMEDIATE_NUMBER)
     ONE_PARAMETER = r'\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
     TWO_PARAMETER_COMMA_SEPARATED = r'\s*([^\s,]*),\s*([^\s,]*)(,\s*[^\s,]*)*\s*'
@@ -90,6 +90,15 @@ class _Meta(iarm.cpu.RegisterCpu):
             r_num = int(match.groups()[0])
         except ValueError:
             r_num = int(match.groups()[0], 16)
+        except TypeError:
+            if arg in 'lr|LR':
+                return 14
+            elif arg in 'sp|SP':
+                return 13
+            elif arg in 'fp|FP':
+                return 7 ## TODO this could be 7 or 11 depending on THUMB and ARM mode http://www.keil.com/support/man/docs/armcc/armcc_chr1359124947957.htm
+            else:
+                raise
         if r_num > self._max_registers:
             raise iarm.exceptions.RuleError(
                 "Register {} is greater than defined registers of {}".format(arg, self._max_registers))

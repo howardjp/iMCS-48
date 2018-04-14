@@ -388,7 +388,7 @@ class Memory(_Meta):
         Ra, Rb, Rc = self.get_three_parameters(self.THREE_PARAMETER_WITH_BRACKETS, params)
 
         if self.is_immediate(Rc):
-            if Rb == 'SP':
+            if Rb == 'SP' or Rb == 'FP':
                 self.check_arguments(low_registers=(Ra,), imm10_4=(Rc,))
             else:
                 self.check_arguments(low_registers=(Ra, Rb), imm7_4=(Rc,))

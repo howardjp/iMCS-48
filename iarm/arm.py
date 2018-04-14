@@ -15,6 +15,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
         self.register.link('PC', 'R15')
         self.register.link('LR', 'R14')
         self.register.link('SP', 'R13')
+        self.register.link('FP', 'R7') # TODO this could be R7 in THUMB mode and R11 in ARM mode
         self.register['PC'] = 1  # PC points to the next instruction in THUMB mode
         # http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0473f/Babbdajb.html
 
