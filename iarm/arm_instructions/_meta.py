@@ -30,11 +30,14 @@ class _Meta(iarm.cpu.RegisterCpu):
         :param code: The code to parse
         :return: A list of tuples in the form of (label, instruction, parameters)
         """
-        remove_comments = re.compile(r'^([^;\n]*);?.*$', re.MULTILINE)
+        remove_comments = re.compile(r'^([^;@\n]*);?.*$', re.MULTILINE)
         code = '\n'.join(remove_comments.findall(code))  # TODO can probably do this better
         # TODO labels with spaces between pipes is allowed `|label with space| INST OPER`
-        parser = re.compile(r'^(\w*)?[ \t\r\f\v]*(\S*)[ \t\r\f\v]*(.*)$', re.MULTILINE)
-        return parser.findall(code)
+        parser = re.compile(r'^(\S*)?[\s]*(\S*)([^\n]*)$', re.MULTILINE)
+        res = parser.findall(code)
+        # Make all parsing of labels and instructions adhere to all uppercase
+        res = [(label.upper(), instruction.upper(), parameters.strip()) for (label, instruction, parameters) in res]
+        return res
 
     def is_register(self, R):
         """

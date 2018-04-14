@@ -152,3 +152,30 @@ class Directives(_Meta):
 
     def directive_OPT(self, label, params):
         warnings.warn("OPT directive is not yet implemented")
+
+    def directive_ARCH(self, label, params):
+        warnings.warn("ARCH directive is not yet implemented")
+    def directive_FPU(self, label, params):
+        warnings.warn("FPU directive is not yet implemented")
+    def directive_EABI_ATTRIBUTE(self, label, params):
+        warnings.warn("EABI_ATTRIBUTE directive is not yet implemented")
+    def directive_FILE(self, label, params):
+        warnings.warn("FILE directive is not yet implemented")
+    def directive_TEXT(self, label, params):
+        warnings.warn("TEXT directive is not yet implemented")
+    def directive_GLOBAL(self, label, params):
+        warnings.warn("GLOBAL directive is not yet implemented")
+    def directive_SYNTAX(self, label, params):
+        warnings.warn("SYNTAX directive is not yet implemented")
+    def directive_CODE(self, label, params):
+        warnings.warn("CODE directive is not yet implemented")
+    def directive_THUMB_FUNC(self, label, params):
+        warnings.warn("THUMB_FUNC directive is not yet implemented")
+    def directive_TYPE(self, label, params):
+        warnings.warn("TYPE directive is not yet implemented")
+    def directive_SIZE(self, label, params):
+        warnings.warn("SIZE directive is not yet implemented")
+    def directive_IDENT(self, label, params):
+        warnings.warn("IDENT directive is not yet implemented")
+    def directive_SECTION(self, label, params):
+        warnings.warn("SECTION directive is not yet implemented")

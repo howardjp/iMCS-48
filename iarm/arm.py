@@ -35,6 +35,7 @@ class Arm(instructions.DataMovement, instructions.Arithmetic,
             if not any(line):
                 continue  # We have a blank line
             label, op, params = line
+            op = op.replace('.', '')  # GCC puts . infront of some stuff, lets just get rid of it
 
             if not op and params.strip():
                 raise iarm.exceptions.ParsingError("Parameters found but no instruction; {}".format(line))
