@@ -344,6 +344,7 @@ class Memory(_Meta):
         # TODO PUSH should reverse the list, not POP
         RPushList = self.get_one_parameter(r'\s*{(.*)}(.*)', params).split(',')
         RPushList = [i.strip() for i in RPushList]
+        # TODO should we make sure the register exists? probably not
 
         def PUSH_func():
             for register in RPushList:

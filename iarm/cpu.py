@@ -48,6 +48,14 @@ class RegisterCpu(object):
             # Rules are defined with starting with 'rule_'
             elif str.startswith(name, 'rule_'):
                 self._rules[name[len('rule_'):]] = method
+            else:
+                # TODO Hokay we need to rethink how we do stuff defined on the classes.
+                # This may mean redoing the internals so that the logic is separated away from the parsing
+                # But in the mean time were going to assume that anything not uppercase or starts with `rule_` then were good
+                # But I should probably look at real code and see what it actually looks like and figure out what makes it
+                # easier
+                #raise Exception("Bad bad programmer, you made a bad method name with `{} ; {}`. Adhere to the rules".format(name, method))
+                pass
 
     def check_arguments(self, **kwargs):
         """
